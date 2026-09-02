@@ -178,7 +178,7 @@ const fetchers = {
     throw new Error('nasa: no image');
   },
   async bing() {
-    const o = (await getJson('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=fr-FR')).images[0];
+    const o = (await getJson('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US')).images[0];
     const m = o.copyright.match(/^(.*?)\s*\((.*)\)\s*$/);
     return { image: `https://www.bing.com${o.urlbase}_UHD.jpg`, title: m ? m[1] : o.title, artist: m ? m[2].replace(/^©\s*/, '') : '', date: `${o.startdate.slice(0, 4)}-${o.startdate.slice(4, 6)}-${o.startdate.slice(6, 8)}`, medium: 'photograph',
       link: o.copyrightlink, caption: `${m ? m[1] : o.title}. ${m ? m[2] : ''}`.trim() };

@@ -1,5 +1,7 @@
 # Morning Brief
 
+![Morning Brief](docs/screenshot.png)
+
 Your day on one page, every weekday morning: to-dos from Slack and Notion, your PRs, your calendar, one thing to push forward, and a painting. Generated locally by Claude Code, with your own Claude subscription. No API keys, no server, no account beyond Claude and the connectors you already use.
 
 ## You need
