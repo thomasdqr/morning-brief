@@ -7,13 +7,13 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ffe500'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,500..550&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500..600;1,500..600&display=swap" rel="stylesheet">
 <style>
 :root {
   --page-bg: #F7F7F7; --yellow: #FFE500; --text: #000; --text-body: rgba(60, 60, 67, 0.6); --text-muted: rgba(0, 0, 0, 0.3);
   --surface: rgba(0, 0, 0, 0.025); --hover: rgba(0, 0, 0, 0.04); --check-border: rgba(0, 0, 0, 0.25); --check-on: #fff;
   --content-max: 1160px; --page-pad: clamp(16px, 6vw, 90px); --content-pad: clamp(20px, 5vw, 60px); --indent: clamp(20px, 3vw, 32px);
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
   --font-mono: 'SF Mono', 'Fira Mono', 'Roboto Mono', 'Courier New', monospace;
   --star: polygon(50% 0%, 60.9% 9.4%, 75% 6.7%, 79.7% 20.3%, 93.3% 25%, 90.6% 39.1%, 100% 50%, 90.6% 60.9%, 93.3% 75%, 79.7% 79.7%, 75% 93.3%, 60.9% 90.6%, 50% 100%, 39.1% 90.6%, 25% 93.3%, 20.3% 79.7%, 6.7% 75%, 9.4% 60.9%, 0% 50%, 9.4% 39.1%, 6.7% 25%, 20.3% 20.3%, 25% 6.7%, 39.1% 9.4%);
@@ -66,16 +66,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .painting-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s ease; }
 .painting-img.loaded { opacity: 1; }
 .painting-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
-.hero-the { font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: clamp(1.65rem, 6cqw, 4.85rem); color: var(--yellow); line-height: 1; text-shadow: 0 2px 20px rgba(0,0,0,.45), 0 0 60px rgba(0,0,0,.25); }
-.hero-day { font-family: var(--font-display); font-weight: 550; font-size: clamp(2.1rem, 10.5cqw, 8.25rem); color: var(--yellow); line-height: .95; letter-spacing: -0.01em; text-shadow: 0 2px 30px rgba(0,0,0,.5), 0 0 80px rgba(0,0,0,.3); white-space: nowrap; }
+.hero-the { font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: clamp(1.65rem, 6cqw, 4.85rem); color: var(--yellow); line-height: 1; letter-spacing: -0.015em; text-shadow: 0 2px 20px rgba(0,0,0,.45), 0 0 60px rgba(0,0,0,.25); }
+.hero-day { font-family: var(--font-display); font-weight: 550; font-size: clamp(2.1rem, 10.5cqw, 8.25rem); color: var(--yellow); line-height: .95; letter-spacing: -0.025em; text-shadow: 0 2px 30px rgba(0,0,0,.5), 0 0 80px rgba(0,0,0,.3); white-space: nowrap; }
 .hero-sub { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 1.5rem; align-items: baseline; padding-top: 10px; }
-.brief-blurb { grid-column: 1 / 8; font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: clamp(.85rem, calc(.6rem + .75cqw), 1.1rem); line-height: 1.5; color: var(--text-body); }
+.brief-blurb { grid-column: 1 / 8; font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: clamp(.85rem, calc(.6rem + .75cqw), 1.1rem); line-height: 1.5; letter-spacing: -0.01em; color: var(--text-body); }
 .painting-caption { grid-column: 8 / -1; font-family: var(--font-mono); font-size: clamp(8px, calc(6px + .45cqw), 10px); letter-spacing: .02em; color: var(--text-muted); text-align: right; line-height: 1.5; }
 
 /* Content grid */
 .content { width: 100%; padding: 48px var(--content-pad) clamp(48px, 12cqw, 120px); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 1.5rem; row-gap: clamp(32px, 7cqw, 64px); font-size: clamp(14px, calc(8px + .95cqw), 18px); }
 .brief-section { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 1.5rem; row-gap: 20px; }
-.section-title { grid-column: 1 / -1; font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: 1.47em; color: var(--text); opacity: .85; padding-left: var(--indent); line-height: 1.3; }
+.section-title { grid-column: 1 / -1; font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: 1.47em; color: var(--text); opacity: .85; padding-left: var(--indent); line-height: 1.3; letter-spacing: -0.01em; }
 .section-body { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 1.5rem; row-gap: clamp(28px, 4cqw, 40px); }
 .brief-section--inline { row-gap: 0; }
 .brief-section--inline .section-title { grid-column: 1 / 5; grid-row: 1; align-self: start; padding-top: .15em; }
@@ -93,7 +93,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .star::before { content: ''; position: absolute; top: -20%; left: -120%; width: 110%; height: 140%; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,.1) 30%, rgba(255,200,220,.2) 38%, rgba(200,220,255,.25) 46%, rgba(220,255,220,.2) 54%, rgba(255,240,200,.15) 62%, rgba(255,255,255,.1) 70%, transparent 80%); transform: skewX(-15deg); opacity: 0; pointer-events: none; }
 .push-badge:hover .star::before, .prep-badge:hover .star::before { opacity: 1; animation: shine .6s ease-out forwards; }
 @keyframes shine { 0% { left: -120%; } 100% { left: 140%; } }
-.star-text { font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: 1.3em; color: #000; transform: rotate(-5deg); text-align: center; line-height: 1.2; margin-top: -.125rem; }
+.star-text { font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: 1.3em; color: #000; transform: rotate(-5deg); text-align: center; line-height: 1.2; margin-top: -.125rem; letter-spacing: -0.01em; }
 .star-arrow { font-family: var(--font-body); font-style: normal; font-size: .8em; opacity: .6; }
 .push-badge:hover .star-arrow, .prep-badge:hover .star-arrow { opacity: 1; }
 
@@ -115,8 +115,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .todo-label, .item-title { font-size: 1.1em; font-weight: 600; line-height: 1.5; display: flex; align-items: center; flex-wrap: wrap; gap: 2px 6px; }
 .todo-label a:hover, .item-title a:hover { border-bottom: 1px solid var(--text-muted); }
 .todo-context, .item-text { font-size: 1em; line-height: 1.8; color: var(--text-body); }
-.item-tag { font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: .85em; color: var(--text-muted); white-space: nowrap; margin-left: 4px; }
-.all-done { grid-column: 5 / -1; font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: 1.2em; color: var(--text-body); padding-left: 12px; margin-top: 8px; }
+.item-tag { font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: .85em; color: var(--text-muted); white-space: nowrap; margin-left: 4px; letter-spacing: -0.01em; }
+.all-done { grid-column: 5 / -1; font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: 1.2em; color: var(--text-body); padding-left: 12px; margin-top: 8px; letter-spacing: -0.01em; }
 
 /* Source icons + avatars */
 .source-icon { display: inline-flex; position: relative; width: 22px; height: 22px; vertical-align: middle; margin: 0 2px; color: var(--text); }
