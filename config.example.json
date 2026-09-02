@@ -1,9 +1,9 @@
 {
   "name": "Your first name",
-  "email": "you@carbonfact.com",
-  "role": "engineer at Carbonfact",
+  "email": "you@example.com",
+  "role": "your role",
   "browser": "Dia",
-  "workdir": "/Users/you/Documents/GitHub/carbonfact",
+  "workdir": "/Users/you/Documents/GitHub/your-repo",
   "artSource": "met",
   "unsplashKey": "",
   "icsUrl": ""

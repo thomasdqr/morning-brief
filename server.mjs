@@ -240,18 +240,11 @@ const server = http.createServer(async (req, res) => {
     catch (e) { return send(res, 500, { error: e.message }); }
   }
 
-  if (req.method === 'GET' && url.pathname.startsWith('/fonts/')) {
-    const file = path.join(ROOT, 'public', 'fonts', path.basename(url.pathname));
-    if (!fs.existsSync(file)) return send(res, 404, { error: 'not found' });
-    res.writeHead(200, { 'content-type': 'font/woff2', 'cache-control': 'public, max-age=31536000' });
-    return res.end(fs.readFileSync(file));
-  }
-
   if (req.method === 'GET' && url.pathname === '/api/brief') {
     const brief = latestBrief();
     const state = readJson(STATE, { done: {} });
     const config = readJson(CONFIG, {});
-    return send(res, 200, { brief, done: state.done, name: config.name || '', workdir: config.workdir || path.join(process.env.HOME, 'Documents/GitHub/carbonfact') });
+    return send(res, 200, { brief, done: state.done, name: config.name || '', workdir: config.workdir || process.env.HOME });
   }
 
   if (req.method === 'POST' && url.pathname === '/api/todo') {
