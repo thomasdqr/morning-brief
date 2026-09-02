@@ -26,7 +26,7 @@ Claude checks your machine, asks 3 short questions, installs a small local serve
 2. `~/Documents/GitHub/morning-brief/scripts/install.sh`
 3. Copy `config.example.json` to `data/config.json` and fill it in (name, email, browser, the repo folder for the yellow buttons).
 4. In Claude Code Desktop, create a scheduled task named `morning-brief`, weekdays at 07:30, with the content of `TASK_PROMPT.md` as its prompt.
-5. Sidebar → Scheduled → **Run now** on `morning-brief`, click **Allow** for each connector and file-access prompt once (remembered after).
+5. Sidebar → Routines → open `morning-brief`, set its permission mode to Auto (pick a model there too if you want one), then **Run now**. Click **Allow** for each connector and file-access prompt once (remembered after).
 
 ## How it works
 
@@ -38,6 +38,7 @@ Claude checks your machine, asks 3 short questions, installs a small local serve
 ## Good to know
 
 - Claude Code Desktop must be open on weekday mornings for the task to fire. If it's closed, the brief is generated the next time you open it.
+- Permission mode and model for the task are set once in its Edit form (Routines sidebar), not by the install script. Auto mode avoids an approval prompt on every Slack/Notion/Calendar call each morning.
 - A checked to-do is never proposed again.
 - Image sources: The Met, Cleveland Museum of Art, NASA picture of the day, Bing photo of the day, Unsplash (needs a free access key from unsplash.com/developers).
 - Everything runs and stays on your machine. `data/` (your briefs, your settings) is never committed.

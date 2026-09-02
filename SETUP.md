@@ -53,11 +53,12 @@ Do NOT edit `~/.claude/settings.json` yourself, and do not tell the user to. It 
 
 ## 7. First run
 
-Tell the user, in this order:
+Permission mode and model are not set by `create_scheduled_task`; they live only in the task's own Edit form. Tell the user, in this order:
 
-1. In the Claude app sidebar, section Scheduled, click **Run now** on `morning-brief`.
-2. It will ask to allow a few things the first time: Slack, Notion, Calendar, and reading/writing files in the morning-brief folder. Click **Allow** for each. This is remembered for every next run of this task, nothing to redo tomorrow.
-3. In about five minutes the brief opens in their browser at http://localhost:4747.
-4. Claude Code Desktop must be open on weekday mornings. If it's closed, the brief is generated the next time it opens.
+1. In the Claude app sidebar, section Routines, open `morning-brief` and switch its permission mode away from the default (which asks approval on every single tool call) to Auto. Pick a model there too if they want a specific one.
+2. Click **Run now**.
+3. The first run still asks to allow Slack, Notion, Calendar, and reading/writing files in the morning-brief folder, once each: click **Allow**. This is remembered for every next run of this task.
+4. In about five minutes the brief opens in their browser at http://localhost:4747.
+5. Claude Code Desktop must be open on weekday mornings. If it's closed, the brief is generated the next time it opens.
 
 Then run `$DIR/scripts/open.sh` so they see the page now (it shows "No brief yet" until the first run finishes).
