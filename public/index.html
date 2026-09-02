@@ -19,11 +19,15 @@
   --star: polygon(50% 0%, 60.9% 9.4%, 75% 6.7%, 79.7% 20.3%, 93.3% 25%, 90.6% 39.1%, 100% 50%, 90.6% 60.9%, 93.3% 75%, 79.7% 79.7%, 75% 93.3%, 60.9% 90.6%, 50% 100%, 39.1% 90.6%, 25% 93.3%, 20.3% 79.7%, 6.7% 75%, 9.4% 60.9%, 0% 50%, 9.4% 39.1%, 6.7% 25%, 20.3% 20.3%, 25% 6.7%, 39.1% 9.4%);
 }
 @media (prefers-color-scheme: dark) {
-  :root { --page-bg: #111111; --text: #F0F0F0; --text-body: rgba(235, 225, 210, 0.6); --text-muted: rgba(255, 255, 255, 0.3);
+  :root:not([data-theme="light"]) { --page-bg: #111111; --text: #F0F0F0; --text-body: rgba(235, 225, 210, 0.6); --text-muted: rgba(255, 255, 255, 0.3);
     --surface: rgba(255, 255, 255, 0.05); --hover: rgba(255, 255, 255, 0.06); --check-border: rgba(255, 255, 255, 0.25); --check-on: #111; }
 }
+:root[data-theme="dark"] { --page-bg: #111111; --text: #F0F0F0; --text-body: rgba(235, 225, 210, 0.6); --text-muted: rgba(255, 255, 255, 0.3);
+  --surface: rgba(255, 255, 255, 0.05); --hover: rgba(255, 255, 255, 0.06); --check-border: rgba(255, 255, 255, 0.25); --check-on: #111; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 body { font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--text); background: var(--page-bg); overflow-x: hidden; text-wrap: pretty; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
@@ -166,7 +170,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Footer */
 .brief-footer { position: relative; width: 100%; min-height: 300px; margin-top: clamp(12px, 2vw, 24px); padding: clamp(72px, 12vw, 120px) var(--content-pad) clamp(100px, 15vw, 160px); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; overflow: hidden; isolation: isolate; }
 .brief-footer__halftone { position: absolute; inset: 0; background-color: var(--page-bg); background-image: radial-gradient(circle, rgba(0,0,0,.14) .65px, transparent .65px); background-size: 5px 5px; -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 100%, #000 15%, transparent 72%), linear-gradient(to top, #000 0%, transparent 55%); -webkit-mask-composite: source-in; mask-image: radial-gradient(ellipse 90% 70% at 50% 100%, #000 15%, transparent 72%), linear-gradient(to top, #000 0%, transparent 55%); mask-composite: intersect; pointer-events: none; z-index: 1; }
-@media (prefers-color-scheme: dark) { .brief-footer__halftone { background-image: radial-gradient(circle, rgba(255,255,255,.1) .65px, transparent .65px); } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brief-footer__halftone { background-image: radial-gradient(circle, rgba(255,255,255,.1) .65px, transparent .65px); } }
+:root[data-theme="dark"] .brief-footer__halftone { background-image: radial-gradient(circle, rgba(255,255,255,.1) .65px, transparent .65px); }
 .brief-footer__inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; }
 .brief-footer__credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4.5px; font-family: var(--font-display); font-size: clamp(1.125rem, 1.6vw, 1.5rem); font-weight: 550; line-height: 32px; letter-spacing: -0.01em; }
 .brief-footer__muted { color: var(--text-muted); }
@@ -216,11 +221,15 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const I18N = {
-  en: { the: 'The', brief: (d) => `${d} Brief`, focus: 'Push your work forward', todos: 'Top to-dos', updates: 'New updates', day: 'Your day', go: "Let's<br>do it", prep: 'Prep me', allDone: 'All done. The day is yours.', made: 'Made for you by', using: 'using', your: 'your', and: 'and', calendar: 'Calendar', love: 'With love from', notes: 'Technical notes', empty: 'No brief yet', emptyHelp: 'The scheduled task in Claude Code Desktop writes one every weekday morning.<br>To make one now: Claude Code, section Scheduled, Run now on <code>morning-brief</code>.', opened: 'Opening Claude Code with your prompt', settingsTitle: 'Image of the day', language: 'Language', settingsHint: 'Saved for every next brief.', keyPlaceholder: 'Unsplash access key', save: 'Save', sources: { met: ['The Met, New York', 'A public-domain painting from the Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'An open-access painting from the Cleveland collection'], nasa: ['NASA, picture of the day', 'Space, one astronomy image each day'], bing: ['Bing, photo of the day', 'A landscape or wildlife photo, new every day'], unsplash: ['Unsplash top shots', 'Popular wallpaper photos. Needs a free access key'] }, months: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'], days: { Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday', Thursday: 'Thursday', Friday: 'Friday', Saturday: 'Saturday', Sunday: 'Sunday' }, hour12: true, answer: 'Answer in English.' },
-  fr: { the: 'Le', brief: (d) => `Brief du ${d}`, focus: 'Fais avancer ton travail', todos: 'À faire', updates: 'Nouveautés', day: 'Ta journée', go: "C'est<br>parti", prep: 'Brief-moi', allDone: 'Tout est fait. La journée est à toi.', made: 'Fait pour toi par', using: 'avec', your: 'ton', and: 'et', calendar: 'Agenda', love: 'Avec amour, de', notes: 'Notes techniques', empty: 'Pas encore de brief', emptyHelp: "La tâche planifiée de Claude Code Desktop en écrit un chaque matin de semaine.<br>Pour en faire un maintenant : Claude Code, section Scheduled, Run now sur <code>morning-brief</code>.", opened: 'Ouverture de Claude Code avec ton prompt', settingsTitle: 'Image du jour', language: 'Langue', settingsHint: 'Mémorisé pour tous les prochains briefs.', keyPlaceholder: 'Clé d\'accès Unsplash', save: 'Enregistrer', sources: { met: ['Le Met, New York', 'Une peinture libre de droits du Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'Une peinture en accès libre de la collection de Cleveland'], nasa: ['NASA, image du jour', 'L\'espace, une image d\'astronomie par jour'], bing: ['Bing, photo du jour', 'Un paysage ou un animal, nouveau chaque jour'], unsplash: ['Unsplash top shots', 'Photos populaires. Demande une clé gratuite'] }, months: ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛT','SEP','OCT','NOV','DÉC'], days: { Monday: 'lundi', Tuesday: 'mardi', Wednesday: 'mercredi', Thursday: 'jeudi', Friday: 'vendredi', Saturday: 'samedi', Sunday: 'dimanche' }, hour12: false, answer: 'Réponds en français.' },
+  en: { the: 'The', brief: (d) => `${d} Brief`, focus: 'Push your work forward', todos: 'Top to-dos', updates: 'New updates', day: 'Your day', go: "Let's<br>do it", prep: 'Prep me', allDone: 'All done. The day is yours.', made: 'Made for you by', using: 'using', your: 'your', and: 'and', calendar: 'Calendar', love: 'With love from', notes: 'Technical notes', empty: 'No brief yet', emptyHelp: 'The scheduled task in Claude Code Desktop writes one every weekday morning.<br>To make one now: Claude Code, section Scheduled, Run now on <code>morning-brief</code>.', opened: 'Opening Claude Code with your prompt', settingsTitle: 'Image of the day', language: 'Language', theme: 'Theme', themeNames: { auto: 'Auto', light: 'Light', dark: 'Dark' }, settingsHint: 'Saved for every next brief.', keyPlaceholder: 'Unsplash access key', save: 'Save', sources: { met: ['The Met, New York', 'A public-domain painting from the Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'An open-access painting from the Cleveland collection'], nasa: ['NASA, picture of the day', 'Space, one astronomy image each day'], bing: ['Bing, photo of the day', 'A landscape or wildlife photo, new every day'], unsplash: ['Unsplash top shots', 'Popular wallpaper photos. Needs a free access key'] }, months: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'], days: { Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday', Thursday: 'Thursday', Friday: 'Friday', Saturday: 'Saturday', Sunday: 'Sunday' }, hour12: true, answer: 'Answer in English.' },
+  fr: { the: 'Le', brief: (d) => `Brief du ${d}`, focus: 'Fais avancer ton travail', todos: 'À faire', updates: 'Nouveautés', day: 'Ta journée', go: "C'est<br>parti", prep: 'Brief-moi', allDone: 'Tout est fait. La journée est à toi.', made: 'Fait pour toi par', using: 'avec', your: 'ton', and: 'et', calendar: 'Agenda', love: 'Avec amour, de', notes: 'Notes techniques', empty: 'Pas encore de brief', emptyHelp: "La tâche planifiée de Claude Code Desktop en écrit un chaque matin de semaine.<br>Pour en faire un maintenant : Claude Code, section Scheduled, Run now sur <code>morning-brief</code>.", opened: 'Ouverture de Claude Code avec ton prompt', settingsTitle: 'Image du jour', language: 'Langue', theme: 'Thème', themeNames: { auto: 'Auto', light: 'Clair', dark: 'Sombre' }, settingsHint: 'Mémorisé pour tous les prochains briefs.', keyPlaceholder: 'Clé d\'accès Unsplash', save: 'Enregistrer', sources: { met: ['Le Met, New York', 'Une peinture libre de droits du Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'Une peinture en accès libre de la collection de Cleveland'], nasa: ['NASA, image du jour', 'L\'espace, une image d\'astronomie par jour'], bing: ['Bing, photo du jour', 'Un paysage ou un animal, nouveau chaque jour'], unsplash: ['Unsplash top shots', 'Photos populaires. Demande une clé gratuite'] }, months: ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛT','SEP','OCT','NOV','DÉC'], days: { Monday: 'lundi', Tuesday: 'mardi', Wednesday: 'mercredi', Thursday: 'jeudi', Friday: 'vendredi', Saturday: 'samedi', Sunday: 'dimanche' }, hour12: false, answer: 'Réponds en français.' },
 };
 let lang = 'en';
 try { lang = localStorage.getItem('brief.lang') || (navigator.language.startsWith('fr') ? 'fr' : 'en'); } catch {}
+let theme = 'auto';
+try { theme = localStorage.getItem('brief.theme') || 'auto'; } catch {}
+const applyTheme = () => { document.documentElement.dataset.theme = theme === 'auto' ? '' : theme; };
+applyTheme();
 const T = () => I18N[lang];
 const tx = (v) => (v && typeof v === 'object') ? (v[lang] ?? v.en ?? '') : (v ?? '');
 
@@ -271,6 +280,7 @@ let artBusy = false;
 const renderSettings = () => {
   const t = T();
   $('#settings').innerHTML = `<div class="row2"><h4>${t.language}</h4><span class="seg"><button data-lang="en" class="${lang === 'en' ? 'on' : ''}">EN</button><button data-lang="fr" class="${lang === 'fr' ? 'on' : ''}">FR</button></span></div>
+    <div class="row2"><h4>${t.theme}</h4><span class="seg">${['auto', 'light', 'dark'].map((k) => `<button data-theme-choice="${k}" class="${theme === k ? 'on' : ''}">${t.themeNames[k]}</button>`).join('')}</span></div>
     <h4>${t.settingsTitle}</h4>
     ${settings.sources.map((k) => `<label class="opt ${artBusy ? 'busy' : ''}"><input type="radio" name="artSource" value="${k}" ${settings.artSource === k ? 'checked' : ''}><span><b>${esc(t.sources[k][0])}</b><small>${esc(t.sources[k][1])}</small></span></label>
       ${k === 'unsplash' && settings.artSource === 'unsplash' ? `<div class="key"><input id="unsplashKey" type="password" placeholder="${settings.hasUnsplashKey ? '••••••••' : esc(t.keyPlaceholder)}"><button id="saveKey">${t.save}</button></div>` : ''}`).join('')}
@@ -422,6 +432,8 @@ const load = async () => {
 document.addEventListener('click', async (ev) => {
   const lb = ev.target.closest('[data-lang]');
   if (lb) { lang = lb.dataset.lang; try { localStorage.setItem('brief.lang', lang); } catch {} render(); renderSettings(); return; }
+  const tb = ev.target.closest('[data-theme-choice]');
+  if (tb) { theme = tb.dataset.themeChoice; try { localStorage.setItem('brief.theme', theme); } catch {} applyTheme(); renderSettings(); return; }
   const toggle = ev.target.closest('[data-toggle]');
   if (toggle) {
     const id = toggle.dataset.toggle;
