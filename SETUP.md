@@ -38,13 +38,7 @@ Get their email from `git config user.email`; if empty, ask. Then write `$DIR/da
 
 Run `$DIR/scripts/install.sh`. It must print `server running: http://localhost:4747`. If it fails, read `/tmp/morning-brief.err` and fix.
 
-## 6. Allow the file writes
-
-Add these rules to `permissions.allow` in `~/.claude/settings.json` (create the array if it doesn't exist, keep every existing entry, replace `$DIR` with the absolute path):
-
-`Read(//$DIR/**)`, `Write(//$DIR/**)`, `Edit(//$DIR/**)`, `Bash(python3 -m json.tool *)`, `Bash(curl -s *)`, `Bash(gh pr list *)`, `Bash(gh pr view *)`, `Bash($DIR/scripts/open.sh)`.
-
-## 7. Create the scheduled task
+## 6. Create the scheduled task
 
 Use the scheduled-tasks tool (`create_scheduled_task`) with:
 
@@ -55,12 +49,14 @@ Use the scheduled-tasks tool (`create_scheduled_task`) with:
 
 If a task with that id already exists, update its prompt instead of creating a new one.
 
-## 8. First run
+Do NOT edit `~/.claude/settings.json` yourself, and do not tell the user to. It is not needed: step 7 below covers file-write approval the same way the connectors were approved in step 2.
+
+## 7. First run
 
 Tell the user, in this order:
 
 1. In the Claude app sidebar, section Scheduled, click **Run now** on `morning-brief`.
-2. Click **Allow** each time it asks about Slack, Notion or Calendar. This is remembered for every next run.
+2. It will ask to allow a few things the first time: Slack, Notion, Calendar, and reading/writing files in the morning-brief folder. Click **Allow** for each. This is remembered for every next run of this task, nothing to redo tomorrow.
 3. In about five minutes the brief opens in their browser at http://localhost:4747.
 4. Claude Code Desktop must be open on weekday mornings. If it's closed, the brief is generated the next time it opens.
 

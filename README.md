@@ -26,7 +26,7 @@ Claude checks your machine, asks 3 short questions, installs a small local serve
 2. `~/Documents/GitHub/morning-brief/scripts/install.sh`
 3. Copy `config.example.json` to `data/config.json` and fill it in (name, email, browser, the repo folder for the yellow buttons).
 4. In Claude Code Desktop, create a scheduled task named `morning-brief`, weekdays at 07:30, with the content of `TASK_PROMPT.md` as its prompt.
-5. Sidebar → Scheduled → **Run now** on `morning-brief`, click **Allow** for each connector once.
+5. Sidebar → Scheduled → **Run now** on `morning-brief`, click **Allow** for each connector and file-access prompt once (remembered after).
 
 ## How it works
 
