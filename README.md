@@ -8,7 +8,7 @@ Your day on one page, every weekday morning: to-dos from Slack and Notion, your 
 
 - A Mac, with the Claude desktop app and Claude Code (any plan that includes Claude Code).
 - Node 20+ and the GitHub CLI (`gh`), logged in.
-- Any browser. Nothing Dia-specific.
+- Any browser.
 
 ## Install in one prompt
 
