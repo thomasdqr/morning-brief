@@ -203,6 +203,10 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, fs.readFileSync(path.join(ROOT, 'public', 'index.html')), 'text/html; charset=utf-8');
   }
 
+  if (req.method === 'GET' && url.pathname === '/favicon.svg') {
+    return send(res, 200, fs.readFileSync(path.join(ROOT, 'public', 'favicon.svg')), 'image/svg+xml');
+  }
+
 
 
   if (req.method === 'GET' && url.pathname === '/api/art') {
