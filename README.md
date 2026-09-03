@@ -23,6 +23,18 @@ Set up Morning Brief for me: clone https://github.com/thomasdqr/morning-brief, t
 
 Claude checks your machine, asks what you do and which apps to read, helps you connect any that are missing, installs a small local server, creates the daily routine, and walks you through the few clicks it cannot do for you. About 5 minutes, most of it Claude working.
 
+## Update in one prompt
+
+Already installed? Paste this in Claude Code:
+
+```
+Update Morning Brief for me: run `git -C ~/Documents/GitHub/morning-brief pull`, then read UPDATE.md in that folder and follow it step by step.
+```
+
+Your briefs and settings live in `data/`, which git never touches. Claude pulls the new code, restarts the local server, adds any config field the new version expects, and refreshes the routine's prompt. That last one matters: the routine keeps its own copy of the prompt, so a plain `git pull` leaves it on the old instructions.
+
+If you prefer the terminal, `scripts/update.sh` does the code and the server, then tells you what is left for Claude.
+
 ## Manual install
 
 1. `git clone https://github.com/thomasdqr/morning-brief ~/Documents/GitHub/morning-brief`
