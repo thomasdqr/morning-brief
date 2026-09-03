@@ -203,11 +203,13 @@ const artFor = async (day) => {
 const git = (args) => new Promise((resolve) => {
   execFile('git', ['-C', ROOT, ...args], { timeout: 4000 }, (err, out) => resolve(err ? null : out.trim()));
 });
+let versionCache = { sha: null, at: 0, data: null };
 const localVersion = async () => {
   const line = await git(['log', '-1', '--format=%h %H %cI']);
   if (!line) return null;
   const [short, sha, date] = line.split(' ');
-  return { short, sha, date };
+  const count = await git(['rev-list', '--count', 'HEAD']);
+  return { version: count ? `v${count}` : short, short, sha, date };
 };
 const repoSlug = async () => {
   const url = await git(['remote', 'get-url', 'origin']);
@@ -261,8 +263,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === 'GET' && url.pathname === '/api/version/check') {
-    const [v, slug] = await Promise.all([localVersion(), repoSlug()]);
+    const v = await localVersion();
     if (!v) return send(res, 404, { error: 'not a git checkout' });
+    const force = url.searchParams.get('force') === '1';
+    if (!force && versionCache.sha === v.sha && Date.now() - versionCache.at < 3600e3) {
+      return send(res, 200, { ...v, ...versionCache.data });
+    }
+    const slug = await repoSlug();
     if (!slug) return send(res, 200, { ...v, unknown: true });
     try {
       const r = await fetch(`https://api.github.com/repos/${slug}/compare/${v.sha}...HEAD`, {
@@ -270,7 +277,11 @@ const server = http.createServer(async (req, res) => {
       });
       if (!r.ok) throw new Error(`github ${r.status}`);
       const cmp = await r.json();
-      return send(res, 200, { ...v, behind: cmp.ahead_by ?? 0, latest: cmp.commits?.at(-1)?.sha?.slice(0, 7) ?? null });
+      const behind = cmp.ahead_by ?? 0;
+      const n = Number(v.version.replace(/^v/, ''));
+      const data = { behind, latestVersion: Number.isFinite(n) ? `v${n + behind}` : null };
+      versionCache = { sha: v.sha, at: Date.now(), data };
+      return send(res, 200, { ...v, ...data });
     } catch (e) {
       return send(res, 200, { ...v, unknown: true, error: e.message });
     }
