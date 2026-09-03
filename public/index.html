@@ -38,7 +38,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .gear { position: fixed; top: 14px; right: 16px; z-index: 20; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--text-muted); background: var(--surface); backdrop-filter: blur(8px); transition: color .2s, transform .4s ease, background .2s; }
 .gear:hover, .gear.on { color: var(--text); transform: rotate(30deg); background: var(--hover); }
 .gear svg { width: 15px; height: 15px; }
-.settings { position: fixed; top: 50px; right: 16px; z-index: 21; width: 300px; padding: 14px 14px 12px; border-radius: 12px; background: var(--page-bg); box-shadow: 0 12px 40px rgba(0,0,0,.14), 0 1px 0 rgba(0,0,0,.06) inset; border: 1px solid var(--surface); opacity: 0; transform: translateY(-6px) scale(.98); pointer-events: none; transition: opacity .2s ease, transform .2s cubic-bezier(.22,1,.36,1); }
+.settings { position: fixed; top: 50px; right: 16px; z-index: 21; width: min(300px, calc(100vw - 32px)); padding: 14px 14px 12px; border-radius: 12px; background: var(--page-bg); box-shadow: 0 12px 40px rgba(0,0,0,.14), 0 1px 0 rgba(0,0,0,.06) inset; border: 1px solid var(--surface); opacity: 0; transform: translateY(-6px) scale(.98); pointer-events: none; transition: opacity .2s ease, transform .2s cubic-bezier(.22,1,.36,1); }
 .settings.open { opacity: 1; transform: none; pointer-events: auto; }
 .settings h4 { font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: 17px; margin: 0 0 8px 4px; }
 .settings .row2 { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 10px; margin-bottom: 6px; border-bottom: 1px solid var(--surface); }
@@ -66,6 +66,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero-edge { position: absolute; z-index: 3; top: 50%; font-family: var(--font-display); font-style: italic; font-weight: 550; font-size: clamp(1.25rem, 5cqw, 4.5rem); color: var(--text); line-height: 1; white-space: nowrap; writing-mode: vertical-lr; }
 .hero-date { left: clamp(-3.75rem, -5cqw, 0px); transform: rotate(180deg) translateY(50%); }
 .hero-time { right: clamp(-3.75rem, -5cqw, 0px); transform: translateY(-50%); font-feature-settings: "onum", "tnum"; }
+.hero-edge-compact { display: none; text-align: center; font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--text-muted); margin: 0 0 12px; }
 .painting-frame { position: relative; width: 100%; aspect-ratio: 1160 / 600; overflow: hidden; background: #2a2826; }
 .painting-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s ease; }
 .painting-img.loaded { opacity: 1; }
@@ -203,7 +204,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .brief-section--inline .section-title, .brief-section--inline .section-body, .push-section .section-title, .push-body, .item-body, .schedule-list, .schedule-right, .brief-section--schedule .section-title, .notes { grid-column: 1 / -1; grid-row: auto; }
   .brief-section--inline { row-gap: 20px; }
   .push-section { padding: var(--indent); }
-  .push-badge { bottom: auto; top: -16px; left: auto; right: 16px; }
+  .push-badge { position: static; grid-column: 1 / -1; justify-self: end; margin-top: 4px; }
+  .hero-edge-compact { display: block; }
   .todo-surface { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); }
   .todo-checkbox { padding-left: 0; }
   .hero-day { white-space: normal; text-align: center; }
@@ -335,6 +337,7 @@ const render = () => {
     <header class="hero">
       <div class="hero-edge hero-date">${esc(dateLabel)}</div>
       <div class="hero-edge hero-time">${esc(timeLabel)}</div>
+      <p class="hero-edge-compact">${esc(dateLabel)} · ${esc(timeLabel)}</p>
       <div class="painting-frame">
         ${brief.art?.image ? `<img class="painting-img" src="${esc(brief.art.image)}" alt="${esc(brief.art.title)}" onload="this.classList.add('loaded')">` : ''}
         <div class="painting-overlay"><span class="hero-the">${t.the}</span><h1 class="hero-day">${esc(t.brief(day))}</h1></div>
