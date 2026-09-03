@@ -23,7 +23,6 @@ cat > "$PLIST" <<PL
   <key>StandardErrorPath</key><string>/tmp/morning-brief.err</string>
 </dict></plist>
 PL
-launchctl bootout gui/$(id -u)/com.thomas.morning-brief.server 2>/dev/null || true
 launchctl bootout gui/$(id -u)/$LABEL 2>/dev/null || true
 launchctl bootstrap gui/$(id -u) "$PLIST"
 sleep 1.5

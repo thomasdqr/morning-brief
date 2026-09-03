@@ -285,7 +285,7 @@ const fmtTime = (hhmm) => {
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
 };
 
-let state = { brief: null, done: {}, workdir: '', name: '', tools: [], profile: '' };
+let state = { brief: null, done: {}, workdir: '', name: '', tools: [] };
 let settings = { artSource: 'met', hasUnsplashKey: false, sources: ['met'] };
 let activeEvent = 0;
 

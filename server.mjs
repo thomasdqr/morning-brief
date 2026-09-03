@@ -1,7 +1,6 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -33,18 +32,6 @@ const readBody = (req) => new Promise((resolve) => {
   req.on('data', (c) => { raw += c; });
   req.on('end', () => { try { resolve(JSON.parse(raw || '{}')); } catch { resolve({}); } });
 });
-
-// Runs `claude -p` with the subscription. No connectors in headless mode, so the
-// prompt has to be self-contained (it is: PROMPT.md asks the generator for that).
-const askClaude = (prompt, cwd) => new Promise((resolve) => {
-  const child = spawn('claude', ['-p', prompt, '--output-format', 'text', '--allowedTools', 'Read,Glob,Grep,Bash(gh *),Bash(git *),WebFetch,WebSearch'], { cwd, env: process.env });
-  let out = '';
-  let err = '';
-  child.stdout.on('data', (c) => { out += c; });
-  child.stderr.on('data', (c) => { err += c; });
-  child.on('close', (code) => resolve({ code, text: out.trim() || err.trim() }));
-});
-
 
 // Google Calendar's connector does not load in scheduled tasks, so the calendar is
 // read from the "secret address in iCal format" stored in data/config.json.
@@ -248,7 +235,7 @@ const server = http.createServer(async (req, res) => {
     const brief = latestBrief();
     const state = readJson(STATE, { done: {} });
     const config = readJson(CONFIG, {});
-    return send(res, 200, { brief, done: state.done, name: config.name || '', profile: config.profile || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || process.env.HOME });
+    return send(res, 200, { brief, done: state.done, name: config.name || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || process.env.HOME });
   }
 
   if (req.method === 'POST' && url.pathname === '/api/todo') {
@@ -259,14 +246,6 @@ const server = http.createServer(async (req, res) => {
     else delete state.done[id];
     writeJson(STATE, state);
     return send(res, 200, { done: state.done });
-  }
-
-  if (req.method === 'POST' && url.pathname === '/api/ask') {
-    const { prompt, cwd, lang } = await readBody(req);
-    if (!prompt) return send(res, 400, { error: 'prompt required' });
-    const workdir = cwd && fs.existsSync(cwd) ? cwd : ROOT;
-    const result = await askClaude(`${prompt}\n\nAnswer in ${lang === 'fr' ? 'French' : 'English'}. Be concise: short sentences, a reader who just woke up.`, workdir);
-    return send(res, 200, result);
   }
 
   send(res, 404, { error: 'not found' });
