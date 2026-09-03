@@ -1,6 +1,6 @@
 # Update runbook (for Claude Code)
 
-You are updating an existing Morning Brief install on this Mac. The person may not be a developer: explain each step in plain words and never leave them with a half-updated install. Their brief history and settings live in `data/`, which is not tracked by git, so nothing of theirs is at risk.
+You are updating an existing Morning Brief install on this machine. The person may not be a developer: explain each step in plain words and never leave them with a half-updated install. Their brief history and settings live in `data/`, which is not tracked by git, so nothing of theirs is at risk.
 
 Folder: `~/Documents/GitHub/morning-brief` (call it `$DIR`).
 
@@ -15,7 +15,7 @@ Run `git -C $DIR pull --ff-only`.
 
 ## 2. Restart the local server
 
-Run `$DIR/scripts/install.sh`. It must print `server running: http://localhost:4747`. It leaves `data/config.json` alone, and it is what picks up any change to `server.mjs`.
+Run `node $DIR/scripts/install.mjs`. It must print `server running: http://localhost:4747`. It leaves `data/config.json` alone, works on macOS, Linux and Windows, and is what picks up any change to `server.mjs`.
 
 ## 3. Fill in config fields the new version expects
 
@@ -35,7 +35,7 @@ If no such routine exists, they never finished setup: switch to `SETUP.md` from 
 ## 5. Check it still works
 
 - `curl -s -o /dev/null -w "%{http_code}" http://localhost:4747/api/brief` must be 200.
-- Run `$DIR/scripts/open.sh` so they see the page. Tell them to reload the tab if it was already open, since the page is cached in the browser.
+- Run `node $DIR/scripts/open.mjs` so they see the page. Tell them to reload the tab if it was already open, since the page is cached in the browser.
 - Their existing brief for today still shows: the update does not regenerate it. Tomorrow's run uses the new version. If they want to see the new version now, tell them to click **Run now** on the routine.
 
 ## 6. Mention what is new, briefly

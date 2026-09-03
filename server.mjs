@@ -1,5 +1,6 @@
 import http from 'node:http';
 import fs from 'node:fs';
+import os from 'node:os';
 import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -291,7 +292,7 @@ const server = http.createServer(async (req, res) => {
     const brief = latestBrief();
     const state = readJson(STATE, { done: {} });
     const config = readJson(CONFIG, {});
-    return send(res, 200, { brief, done: state.done, briefDir: ROOT, name: config.name || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || process.env.HOME });
+    return send(res, 200, { brief, done: state.done, briefDir: ROOT, name: config.name || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || os.homedir() });
   }
 
   if (req.method === 'POST' && url.pathname === '/api/todo') {

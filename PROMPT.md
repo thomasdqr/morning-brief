@@ -1,16 +1,16 @@
 # Morning Brief: generation spec
 
-You are generating today's Morning Brief for the person described in `~/Documents/GitHub/morning-brief/data/config.json`. Read that file first: `name`, `email`, `role`, `profile` (what kind of work they do) and `tools` (which apps to read). Below, "the user" means that person.
+You are generating today's Morning Brief for the person described in `<install>/data/config.json`, where `<install>` is the Morning Brief folder, by default `~/Documents/GitHub/morning-brief` (`%USERPROFILE%\Documents\GitHub\morning-brief` on Windows). Read that file first: `name`, `email`, `role`, `profile` (what kind of work they do) and `tools` (which apps to read). Below, "the user" means that person.
 The brief is shown in a local web page. You produce ONE JSON file. Nothing else.
 
 ## Steps
 
 1. Compute today's date in the machine's local timezone. `DATE` = `YYYY-MM-DD`. `WEEKDAY` = English weekday name.
-2. Read `~/Documents/GitHub/morning-brief/data/state.json` if it exists. Its `done` map lists to-dos the user already checked off (id -> {title, doneAt}). NEVER propose a to-do again if its `id` or a clearly identical subject is in `done`.
-3. Read the previous brief, the most recent file in `~/Documents/GitHub/morning-brief/data/briefs/`, if any. Reuse the same `id` for a to-do that is still open, so state carries over.
+2. Read `<install>/data/state.json` if it exists. Its `done` map lists to-dos the user already checked off (id -> {title, doneAt}). NEVER propose a to-do again if its `id` or a clearly identical subject is in `done`.
+3. Read the previous brief, the most recent file in `<install>/data/briefs/`, if any. Reuse the same `id` for a to-do that is still open, so state carries over.
 4. Gather signals from the tools in `config.tools`, and only those. Read-only: never post, send, assign, comment, or modify anything anywhere. Use the playbook below. If a tool is configured but its connector is missing from this session, skip it and say so in `notes`. If `config.tools` is missing or empty (a config written before tools existed), fall back to every chat, calendar and task connector you do have, and say so in `notes` so the reader knows to set it. Same for a missing `profile`: use the `other` rules.
 5. Artwork: run `curl -s http://localhost:4747/api/art` in Bash and copy the returned object into `art` as is (it already honours the image source chosen in the page settings). If the call fails, retry once, then leave `art` out and note it in `notes`.
-6. Write the JSON to `~/Documents/GitHub/morning-brief/data/briefs/DATE.json`. Validate with `python3 -m json.tool`. Then run `~/Documents/GitHub/morning-brief/scripts/open.sh` (opens the brief in the browser set in config).
+6. Write the JSON to `<install>/data/briefs/DATE.json`. Validate it parses: `node -e "JSON.parse(require('fs').readFileSync(process.argv[1]))" <the file>`. Then run `node <install>/scripts/open.mjs`, which opens the brief in the browser set in config.
 
 ## Tool playbook
 

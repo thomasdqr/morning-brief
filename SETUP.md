@@ -1,15 +1,16 @@
 # Setup runbook (for Claude Code)
 
-You are installing Morning Brief on this Mac for the person talking to you. They may not be a developer: never assume they know git, JSON, or the terminal. Do the steps in order, explain each manual click in plain words, and wait when a step says to wait. Report what you did at the end in five lines or fewer.
+You are installing Morning Brief on this machine for the person talking to you. It runs on macOS, Linux and Windows; check `process.platform` or `uname` early and use the right paths and commands throughout. They may not be a developer: never assume they know git, JSON, or the terminal. Do the steps in order, explain each manual click in plain words, and wait when a step says to wait. Report what you did at the end in five lines or fewer.
 
-Target folder: `~/Documents/GitHub/morning-brief` (call it `$DIR`). Repository: `https://github.com/thomasdqr/morning-brief`.
+Target folder: `~/Documents/GitHub/morning-brief`, or `%USERPROFILE%\Documents\GitHub\morning-brief` on Windows. Call it `$DIR`. Repository: `https://github.com/thomasdqr/morning-brief`.
 
 ## 1. Check the machine
 
-- `uname` must be `Darwin`. If not, stop: Morning Brief is macOS only.
 - `node --version` must be 20 or newer. If node is missing, tell them to install it from https://nodejs.org, then stop.
-- `ls /Applications/Claude.app` must exist.
+- The Claude desktop app must be installed, since the daily routine lives there. macOS: `/Applications/Claude.app`. Windows: under `%LOCALAPPDATA%\Programs` or the Start menu. Linux: the `claude` desktop entry or package. If you cannot find it, ask them rather than assuming.
+- `git --version` must work, since the install is a clone and the version check reads it.
 - `gh auth status`: only needed if they pick GitHub in step 3. If it fails then, tell them to run `gh auth login` in a terminal.
+- On Windows, if this session is running inside WSL, say so and ask them to redo it in a native Windows session: connectors are not available under WSL, and the brief needs them.
 
 ## 2. Who is this brief for
 
@@ -70,7 +71,7 @@ Keep only the tools that are actually reachable in the final `tools` list, and t
 
 Ask two last questions:
 
-1. Which browser to open the brief in, as the app name in /Applications (offer: the default browser, Dia, Arc, Google Chrome, Safari). Empty means the system default.
+1. Which browser to open the brief in. Empty means the system default, which is the right answer for most people. If they name one, write what their OS needs: the app name on macOS (`Dia`, `Arc`, `Google Chrome`), the binary on Linux (`firefox`, `google-chrome`), the executable on Windows (`chrome`, `msedge`).
 2. Only if they picked `github` or `gitlab`: which repo folder Claude should open when they click the yellow button. Default to the current working directory if it looks like a git repo. Otherwise leave `workdir` empty.
 
 Write `$DIR/data/config.json` (create `$DIR/data` if needed):
@@ -81,7 +82,7 @@ Write `$DIR/data/config.json` (create `$DIR/data` if needed):
 
 ## 7. Install the local server
 
-Run `$DIR/scripts/install.sh`. It must print `server running: http://localhost:4747`. If it fails, read `/tmp/morning-brief.err` and fix it. Explain in one line what it did: a small local server that shows the page and remembers which to-dos they ticked.
+Run `node $DIR/scripts/install.mjs`. It must print `server running: http://localhost:4747`. It picks the right mechanism per platform: a launchd agent on macOS, a systemd user service on Linux, a Startup entry on Windows. If it fails, it prints the command to run the server in the foreground so you can see the real error. Explain in one line what it did: a small local server that shows the page and remembers which to-dos they ticked.
 
 ## 8. Create the routine
 
@@ -115,7 +116,7 @@ Then tell them, in this order:
 3. It takes about five minutes. When it finishes, the brief opens in their browser at http://localhost:4747.
 4. From then on it runs by itself every weekday at 07:30, as long as the Claude app is open. If the app is closed at that time, the brief is generated the next time they open it.
 
-Then run `$DIR/scripts/open.sh` so they see the page now. Warn them it says "No brief yet" until the first run finishes.
+Then run `node $DIR/scripts/open.mjs` so they see the page now. Warn them it says "No brief yet" until the first run finishes.
 
 ## 11. Tell them how to change their mind
 
