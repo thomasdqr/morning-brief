@@ -1,5 +1,6 @@
 import http from 'node:http';
 import fs from 'node:fs';
+import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -196,6 +197,24 @@ const artFor = async (day) => {
   return art;
 };
 
+
+// Version = the local commit. Nothing to bump by hand, and "am I on the latest?"
+// is then a straight comparison with the repo's default branch.
+const git = (args) => new Promise((resolve) => {
+  execFile('git', ['-C', ROOT, ...args], { timeout: 4000 }, (err, out) => resolve(err ? null : out.trim()));
+});
+const localVersion = async () => {
+  const line = await git(['log', '-1', '--format=%h %H %cI']);
+  if (!line) return null;
+  const [short, sha, date] = line.split(' ');
+  return { short, sha, date };
+};
+const repoSlug = async () => {
+  const url = await git(['remote', 'get-url', 'origin']);
+  const m = url?.match(/github\.com[:/]([^/]+\/[^/.]+)/);
+  return m ? m[1] : null;
+};
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
@@ -235,11 +254,33 @@ const server = http.createServer(async (req, res) => {
     catch (e) { return send(res, 500, { error: e.message }); }
   }
 
+
+  if (req.method === 'GET' && url.pathname === '/api/version') {
+    const v = await localVersion();
+    return v ? send(res, 200, v) : send(res, 404, { error: 'not a git checkout' });
+  }
+
+  if (req.method === 'GET' && url.pathname === '/api/version/check') {
+    const [v, slug] = await Promise.all([localVersion(), repoSlug()]);
+    if (!v) return send(res, 404, { error: 'not a git checkout' });
+    if (!slug) return send(res, 200, { ...v, unknown: true });
+    try {
+      const r = await fetch(`https://api.github.com/repos/${slug}/compare/${v.sha}...HEAD`, {
+        headers: { 'user-agent': 'morning-brief', accept: 'application/vnd.github+json' },
+      });
+      if (!r.ok) throw new Error(`github ${r.status}`);
+      const cmp = await r.json();
+      return send(res, 200, { ...v, behind: cmp.ahead_by ?? 0, latest: cmp.commits?.at(-1)?.sha?.slice(0, 7) ?? null });
+    } catch (e) {
+      return send(res, 200, { ...v, unknown: true, error: e.message });
+    }
+  }
+
   if (req.method === 'GET' && url.pathname === '/api/brief') {
     const brief = latestBrief();
     const state = readJson(STATE, { done: {} });
     const config = readJson(CONFIG, {});
-    return send(res, 200, { brief, done: state.done, name: config.name || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || process.env.HOME });
+    return send(res, 200, { brief, done: state.done, briefDir: ROOT, name: config.name || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || process.env.HOME });
   }
 
   if (req.method === 'POST' && url.pathname === '/api/todo') {

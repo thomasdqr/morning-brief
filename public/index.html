@@ -182,6 +182,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .brief-footer__brand .source-icon { width: 21px; height: 21px; margin: 0; }
 .brief-footer__love { display: flex; align-items: center; gap: 4px; font-family: var(--font-display); font-weight: 550; font-size: 15px; color: #8c8c8c; }
 .brief-footer__circles { display: inline-flex; gap: 4px; }
+.version { display: block; margin: 10px auto 0; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .03em; color: var(--text-muted); opacity: .75; transition: opacity .2s, color .2s; }
+.version:hover { opacity: 1; color: var(--text-body); }
+.version.behind { color: #B8860B; opacity: 1; }
+:root[data-theme="dark"] .version.behind, :root:not([data-theme="light"]) .version.behind { color: var(--yellow); }
 .brief-footer__circle { display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; border: .5px solid #8c8c8c; border-radius: 50%; font-size: 12px; line-height: 1; color: #8c8c8c; }
 .brief-footer__circles:hover .brief-footer__circle { animation: wave .82s cubic-bezier(.34,1.45,.56,1) 1 backwards; }
 .brief-footer__circles:hover .brief-footer__circle:nth-child(2) { animation-delay: .11s; }
@@ -224,8 +228,8 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const I18N = {
-  en: { the: 'The', brief: (d) => `${d} Brief`, focus: 'Push your work forward', todos: 'Top to-dos', updates: 'New updates', day: 'Your day', go: "Let's<br>do it", prep: 'Prep me', allDone: 'All done. The day is yours.', made: 'Made for you by', using: 'using', your: 'your', and: 'and', calendar: 'Calendar', love: 'With love from', notes: 'Technical notes', empty: 'No brief yet', emptyHelp: 'The scheduled task in Claude Code Desktop writes one every weekday morning.<br>To make one now: Claude Code, section Scheduled, Run now on <code>morning-brief</code>.', opened: 'Opening Claude Code with your prompt', settingsTitle: 'Image of the day', language: 'Language', theme: 'Theme', themeNames: { auto: 'Auto', light: 'Light', dark: 'Dark' }, settingsHint: 'Saved for every next brief.', keyPlaceholder: 'Unsplash access key', save: 'Save', sources: { met: ['The Met, New York', 'A public-domain painting from the Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'An open-access painting from the Cleveland collection'], nasa: ['NASA, picture of the day', 'Space, one astronomy image each day'], bing: ['Bing, photo of the day', 'A landscape or wildlife photo, new every day'], unsplash: ['Unsplash top shots', 'Popular wallpaper photos. Needs a free access key'] }, months: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'], days: { Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday', Thursday: 'Thursday', Friday: 'Friday', Saturday: 'Saturday', Sunday: 'Sunday' }, hour12: true, answer: 'Answer in English.' },
-  fr: { the: 'Le', brief: (d) => `Brief du ${d}`, focus: 'Fais avancer ton travail', todos: 'À faire', updates: 'Nouveautés', day: 'Ta journée', go: "C'est<br>parti", prep: 'Brief-moi', allDone: 'Tout est fait. La journée est à toi.', made: 'Fait pour toi par', using: 'avec', your: 'ton', and: 'et', calendar: 'Agenda', love: 'Avec amour, de', notes: 'Notes techniques', empty: 'Pas encore de brief', emptyHelp: "La tâche planifiée de Claude Code Desktop en écrit un chaque matin de semaine.<br>Pour en faire un maintenant : Claude Code, section Scheduled, Run now sur <code>morning-brief</code>.", opened: 'Ouverture de Claude Code avec ton prompt', settingsTitle: 'Image du jour', language: 'Langue', theme: 'Thème', themeNames: { auto: 'Auto', light: 'Clair', dark: 'Sombre' }, settingsHint: 'Mémorisé pour tous les prochains briefs.', keyPlaceholder: 'Clé d\'accès Unsplash', save: 'Enregistrer', sources: { met: ['Le Met, New York', 'Une peinture libre de droits du Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'Une peinture en accès libre de la collection de Cleveland'], nasa: ['NASA, image du jour', 'L\'espace, une image d\'astronomie par jour'], bing: ['Bing, photo du jour', 'Un paysage ou un animal, nouveau chaque jour'], unsplash: ['Unsplash top shots', 'Photos populaires. Demande une clé gratuite'] }, months: ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛT','SEP','OCT','NOV','DÉC'], days: { Monday: 'lundi', Tuesday: 'mardi', Wednesday: 'mercredi', Thursday: 'jeudi', Friday: 'vendredi', Saturday: 'samedi', Sunday: 'dimanche' }, hour12: false, answer: 'Réponds en français.' },
+  en: { the: 'The', brief: (d) => `${d} Brief`, focus: 'Push your work forward', todos: 'Top to-dos', updates: 'New updates', day: 'Your day', go: "Let's<br>do it", prep: 'Prep me', allDone: 'All done. The day is yours.', made: 'Made for you by', using: 'using', your: 'your', and: 'and', calendar: 'Calendar', love: 'With love from', notes: 'Technical notes', empty: 'No brief yet', emptyHelp: 'The scheduled task in Claude Code Desktop writes one every weekday morning.<br>To make one now: Claude Code, section Scheduled, Run now on <code>morning-brief</code>.', opened: 'Opening Claude Code with your prompt', checking: 'checking…', upToDate: 'up to date', behind: (n) => `${n} update${n > 1 ? 's' : ''} behind, click to update`, updating: 'Opening Claude Code to update', settingsTitle: 'Image of the day', language: 'Language', theme: 'Theme', themeNames: { auto: 'Auto', light: 'Light', dark: 'Dark' }, settingsHint: 'Saved for every next brief.', keyPlaceholder: 'Unsplash access key', save: 'Save', sources: { met: ['The Met, New York', 'A public-domain painting from the Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'An open-access painting from the Cleveland collection'], nasa: ['NASA, picture of the day', 'Space, one astronomy image each day'], bing: ['Bing, photo of the day', 'A landscape or wildlife photo, new every day'], unsplash: ['Unsplash top shots', 'Popular wallpaper photos. Needs a free access key'] }, months: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'], days: { Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday', Thursday: 'Thursday', Friday: 'Friday', Saturday: 'Saturday', Sunday: 'Sunday' }, hour12: true, answer: 'Answer in English.' },
+  fr: { the: 'Le', brief: (d) => `Brief du ${d}`, focus: 'Fais avancer ton travail', todos: 'À faire', updates: 'Nouveautés', day: 'Ta journée', go: "C'est<br>parti", prep: 'Brief-moi', allDone: 'Tout est fait. La journée est à toi.', made: 'Fait pour toi par', using: 'avec', your: 'ton', and: 'et', calendar: 'Agenda', love: 'Avec amour, de', notes: 'Notes techniques', empty: 'Pas encore de brief', emptyHelp: "La tâche planifiée de Claude Code Desktop en écrit un chaque matin de semaine.<br>Pour en faire un maintenant : Claude Code, section Scheduled, Run now sur <code>morning-brief</code>.", opened: 'Ouverture de Claude Code avec ton prompt', checking: 'vérification…', upToDate: 'à jour', behind: (n) => `${n} mise${n > 1 ? 's' : ''} à jour de retard, clique pour mettre à jour`, updating: 'Ouverture de Claude Code pour mettre à jour', settingsTitle: 'Image du jour', language: 'Langue', theme: 'Thème', themeNames: { auto: 'Auto', light: 'Clair', dark: 'Sombre' }, settingsHint: 'Mémorisé pour tous les prochains briefs.', keyPlaceholder: 'Clé d\'accès Unsplash', save: 'Enregistrer', sources: { met: ['Le Met, New York', 'Une peinture libre de droits du Metropolitan Museum'], cma: ['Cleveland Museum of Art', 'Une peinture en accès libre de la collection de Cleveland'], nasa: ['NASA, image du jour', 'L\'espace, une image d\'astronomie par jour'], bing: ['Bing, photo du jour', 'Un paysage ou un animal, nouveau chaque jour'], unsplash: ['Unsplash top shots', 'Photos populaires. Demande une clé gratuite'] }, months: ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛT','SEP','OCT','NOV','DÉC'], days: { Monday: 'lundi', Tuesday: 'mardi', Wednesday: 'mercredi', Thursday: 'jeudi', Friday: 'vendredi', Saturday: 'samedi', Sunday: 'dimanche' }, hour12: false, answer: 'Réponds en français.' },
 };
 let lang = 'en';
 try { lang = localStorage.getItem('brief.lang') || (navigator.language.startsWith('fr') ? 'fr' : 'en'); } catch {}
@@ -291,10 +295,10 @@ let settings = { artSource: 'met', hasUnsplashKey: false, sources: ['met'] };
 let activeEvent = 0;
 
 // Opens a new Claude Code session in the Claude desktop app, prompt pre-filled. Nothing is sent until the user presses Enter.
-const openInClaude = (prompt) => {
+const openInClaude = (prompt, folder = state.workdir, note = T().opened) => {
   const full = `${prompt}\n\n${T().answer}`.slice(0, 12000);
-  window.location.href = `claude://code/new?folder=${encodeURIComponent(state.workdir)}&q=${encodeURIComponent(full)}&source=morning_brief`;
-  toast(T().opened);
+  window.location.href = `claude://code/new?folder=${encodeURIComponent(folder)}&q=${encodeURIComponent(full)}&source=morning_brief`;
+  toast(note);
 };
 let toastTimer;
 const toast = (msg) => { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600); };
@@ -336,6 +340,37 @@ $('#gear').onclick = (ev) => { ev.stopPropagation(); renderSettings(); const ope
 document.addEventListener('click', (ev) => { if (!ev.target.closest('#settings') && !ev.target.closest('#gear')) { $('#settings').classList.remove('open'); $('#gear').classList.remove('on'); } });
 document.addEventListener('change', (ev) => { if (ev.target.name === 'artSource') saveSettings({ artSource: ev.target.value }); });
 document.addEventListener('click', (ev) => { if (ev.target.id === 'saveKey') saveSettings({ artSource: 'unsplash', unsplashKey: $('#unsplashKey').value }); });
+
+
+// Version line: shows the local commit, checks for newer ones on click, then hands
+// the update to Claude (the routine's own prompt copy can only be refreshed there).
+let version = null;
+let behind = null;
+const paintVersion = (label) => {
+  const el = $('#version');
+  if (!version) { el.hidden = true; return; }
+  el.hidden = false;
+  el.textContent = label ?? `${version.short} · ${new Date(version.date).toLocaleDateString(T().locale ?? undefined, { day: '2-digit', month: 'short', year: 'numeric' })}`;
+  el.classList.toggle('behind', behind > 0);
+};
+const loadVersion = async () => {
+  try { version = await (await fetch('/api/version')).json(); if (version.error) version = null; } catch { version = null; }
+  paintVersion();
+};
+const checkVersion = async () => {
+  if (behind > 0) {
+    openInClaude(`Update Morning Brief: run \`git -C ${state.briefDir} pull\`, then read UPDATE.md in that folder and follow it step by step. My install is ${behind} commit(s) behind ${version.short}.`, state.briefDir, T().updating);
+    return;
+  }
+  paintVersion(T().checking);
+  try {
+    const r = await (await fetch('/api/version/check')).json();
+    if (r.unknown || typeof r.behind !== 'number') { paintVersion(); toast(r.error ?? T().upToDate); return; }
+    behind = r.behind;
+    if (behind > 0) paintVersion(T().behind(behind));
+    else { paintVersion(T().upToDate); setTimeout(paintVersion, 2400); }
+  } catch (e) { paintVersion(); toast(e.message); }
+};
 
 const render = () => {
   const t = T();
@@ -432,8 +467,11 @@ const render = () => {
         <p class="brief-footer__credit"><span class="brief-footer__muted">${t.made}</span><span class="brief-footer__brand">${srcIcon('claude')}<span>Claude Code</span></span><span class="brief-footer__muted">${t.using}</span><span class="brief-footer__muted brief-footer__emph">${t.your}</span>
           ${toolList()}.</p>
         <p class="brief-footer__love"><span>${t.love}</span><span class="brief-footer__circles"><span class="brief-footer__circle">T</span><span class="brief-footer__circle">D</span><span class="brief-footer__circle">Q</span></span></p>
+        <button class="version" id="version" hidden></button>
       </div>
     </footer>`;
+  const v = $('#version');
+  if (v) { v.onclick = checkVersion; paintVersion(behind > 0 ? T().behind(behind) : undefined); }
 };
 
 const load = async () => {
@@ -452,6 +490,7 @@ const load = async () => {
   }
   render();
   try { settings = await (await fetch('/api/settings')).json(); } catch {}
+  await loadVersion();
   await loadArt(false);
 };
 

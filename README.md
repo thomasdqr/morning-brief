@@ -55,6 +55,7 @@ If you prefer the terminal, `scripts/update.sh` does the code and the server, th
 
 - Claude Code Desktop must be open on weekday mornings for the task to fire. If it's closed, the brief is generated the next time you open it.
 - Permission mode and model for the task are set once in its Edit form (Routines sidebar), not by the install script. Auto mode avoids an approval prompt on every Slack/Notion/Calendar call each morning.
+- The small line at the very bottom of the page is the version you are on. Click it to check for a newer one; if there is one, clicking again hands the update to Claude.
 - A checked to-do is never proposed again.
 - Image sources: The Met, Cleveland Museum of Art, NASA picture of the day, Bing photo of the day, Unsplash (needs a free access key from unsplash.com/developers).
 - Tools without a bundled logo still work: the brief shows a small lettered badge instead.
