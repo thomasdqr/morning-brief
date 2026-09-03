@@ -248,7 +248,7 @@ const server = http.createServer(async (req, res) => {
     const brief = latestBrief();
     const state = readJson(STATE, { done: {} });
     const config = readJson(CONFIG, {});
-    return send(res, 200, { brief, done: state.done, name: config.name || '', workdir: config.workdir || process.env.HOME });
+    return send(res, 200, { brief, done: state.done, name: config.name || '', profile: config.profile || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || process.env.HOME });
   }
 
   if (req.method === 'POST' && url.pathname === '/api/todo') {

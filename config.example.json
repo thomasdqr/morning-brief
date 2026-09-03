@@ -1,9 +1,15 @@
 {
   "name": "Your first name",
   "email": "you@example.com",
-  "role": "your role",
-  "browser": "Dia",
-  "workdir": "/Users/you/Documents/GitHub/your-repo",
+  "role": "your role, e.g. Account Executive",
+  "profile": "one of: engineer, designer, product, sales, marketing, support, ops, management, other",
+  "tools": [
+    "slack",
+    "gcal",
+    "notion"
+  ],
+  "browser": "",
+  "workdir": "",
   "artSource": "met",
   "unsplashKey": "",
   "icsUrl": ""

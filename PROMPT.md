@@ -1,31 +1,58 @@
 # Morning Brief: generation spec
 
-You are generating today's Morning Brief for the user described in `~/Documents/GitHub/morning-brief/data/config.json` (`name`, `email`, `role`). Read it first. Below, "the user" means that person.
+You are generating today's Morning Brief for the person described in `~/Documents/GitHub/morning-brief/data/config.json`. Read that file first: `name`, `email`, `role`, `profile` (what kind of work they do) and `tools` (which apps to read). Below, "the user" means that person.
 The brief is shown in a local web page. You produce ONE JSON file. Nothing else.
 
 ## Steps
 
-1. Compute today's date in Europe/Paris. `DATE` = `YYYY-MM-DD`. `WEEKDAY` = English weekday name.
+1. Compute today's date in the machine's local timezone. `DATE` = `YYYY-MM-DD`. `WEEKDAY` = English weekday name.
 2. Read `~/Documents/GitHub/morning-brief/data/state.json` if it exists. Its `done` map lists to-dos the user already checked off (id -> {title, doneAt}). NEVER propose a to-do again if its `id` or a clearly identical subject is in `done`.
 3. Read the previous brief, the most recent file in `~/Documents/GitHub/morning-brief/data/briefs/`, if any. Reuse the same `id` for a to-do that is still open, so state carries over.
-4. Gather signals, read-only (never post, send, or modify anything):
-   - Calendar: use the Google Calendar connector (`list_events` on the primary calendar, today 00:00 to 23:59 Europe/Paris, ordered by start time). Skip all-day events and events the user declined. Fallback if the connector tool is absent: run `curl -s http://localhost:4747/api/calendar` in Bash, which reads an iCal feed when `data/config.json` has an `icsUrl`. If both fail, note it in `notes`.
-   - Slack: last 48h: messages mentioning the user, DMs to the user, replies in threads he posted in. Note who asked what, and whether the user already replied. Fetch the Slack profile of each person you name to get their avatar image URL (`image_72` or similar).
-   - Notion: tasks assigned to the user that are not done, comments mentioning him. Use the Notion users list to get each person's `avatar_url`.
-   - GitHub: run `gh` in Bash from `data/config.json` -> `workdir` (the repo Claude should look at). `gh pr list --author @me`, `gh pr list --search "review-requested:@me"`, and the user's PRs with review comments in the last 24h.
+4. Gather signals from the tools in `config.tools`, and only those. Read-only: never post, send, assign, comment, or modify anything anywhere. Use the playbook below. If a tool is configured but its connector is missing from this session, skip it and say so in `notes`.
 5. Artwork: run `curl -s http://localhost:4747/api/art` in Bash and copy the returned object into `art` as is (it already honours the image source chosen in the page settings). If the call fails, retry once, then leave `art` out and note it in `notes`.
 6. Write the JSON to `~/Documents/GitHub/morning-brief/data/briefs/DATE.json`. Validate with `python3 -m json.tool`. Then run `~/Documents/GitHub/morning-brief/scripts/open.sh` (opens the brief in the browser set in config).
 
+## Tool playbook
+
+Each item you emit carries a `source`: the tool id it came from, exactly as written in `config.tools`.
+
+| Tool id | What to read, last 48h unless stated | Look for |
+|---|---|---|
+| `slack` / `teams` | Messages mentioning the user, DMs, replies in threads they posted in | Who asked what, and whether the user already answered. Fetch each named person's avatar URL when the API offers one |
+| `gcal` / `outlook` | Today's events, 00:00 to 23:59 local, ordered by start | Skip all-day events and ones the user declined. Note attendees and whether the user has not replied yet |
+| `gmail` | Unread or recent mail addressed directly to the user | Threads waiting on their reply. Ignore newsletters and automated notifications |
+| `notion` / `confluence` | Pages and tasks assigned to the user, comments mentioning them | Not-done tasks, overdue dates, questions left on their pages |
+| `jira` / `linear` / `asana` | Issues assigned to the user, and ones they reported that moved | Due or overdue, blocked, waiting on them, changed status since yesterday |
+| `github` / `gitlab` | Run the CLI in Bash from `config.workdir` when set. `gh pr list --author @me`, `gh pr list --search "review-requested:@me"` | Their open PRs, reviews requested of them, new review comments |
+| `figma` | Files and comments where they are mentioned | Comments awaiting an answer, review requests |
+| `hubspot` / other CRM | Deals and contacts they own | Stalled deals, tasks due, follow-ups promised |
+
+Any tool id not in this table: read the obvious "assigned to me / mentions me / due today" surfaces, and treat it like the closest row above.
+
+## What matters depends on the profile
+
+`config.profile` decides what belongs in the brief. Same rule everywhere: something a person is waiting on, or a deadline, beats an FYI.
+
+- `engineer`: PRs waiting on them, broken builds, blocked tickets, the one piece of code worth pushing forward today.
+- `designer`: files and comments awaiting feedback, handoffs blocked on a spec, reviews scheduled today.
+- `product`: decisions others are blocked on, specs due, tickets missing acceptance criteria, meetings needing an agenda.
+- `sales`: deals gone quiet, follow-ups promised, calls today and what was said last time.
+- `marketing`: launches dated today or this week, content awaiting review, campaign numbers someone asked about.
+- `support`: tickets breaching soon, escalations, bug reports that need an owner.
+- `ops`: approvals waiting on them, recurring deadlines, processes stuck at their step.
+- `management`: people blocked on their decision, one-on-ones today, commitments made to others.
+- `other` or unset: prefer anything where a named person is waiting on the user, then anything with a date today or overdue.
+
 ## Editorial rules: short, for someone who just woke up
 
-- Every text field is an object `{ "en": "...", "fr": "..." }`. Same meaning in both. French is natural French, not a word-for-word translation. `tu` form. Address the user by their first name only when it reads naturally.
+- Every text field is an object `{ "en": "...", "fr": "..." }`. Same meaning in both. French is natural French, not word for word. `tu` form. Use the user's first name only when it reads naturally.
 - Titles: max 8 words. One concrete action or fact. No trailing period.
 - Bodies: ONE sentence, max 15 words. Who, what, since when. Nothing else.
 - `summary`: one sentence, max 18 words: the shape of the day.
-- No emoji. No em dashes. No jargon a sleepy reader would trip on.
-- `focus`: the single most valuable piece of work to push today (a bet, a PR, a plan the user owns). `prompt` is a complete, self-contained instruction in English that a fresh Claude session could act on (names, links, numbers, file paths). It is not shown, so it can be long.
-- `todos`: 3 to 6 items, most urgent first. Optional `tag`: a short project or area name (e.g. "Onboarding", "Q3 Roadmap"), plain string. `source` is one of `slack`, `notion`, `github`, `calendar`. `id` is a stable kebab-case slug from the subject, not from the date. `people` lists the humans involved with `name` and, when found, `avatar` (https URL). Include `url` (Slack permalink, Notion page URL, PR URL) when you have one.
-- `updates`: 0 to 4 things that changed and the user should know but need not act on. `tag` is a short project or bet name.
+- No emoji. No em dashes. No jargon a sleepy reader would trip on. No internal codes the user would not recognise instantly.
+- `focus`: the single most valuable piece of work to push today, judged by the profile rules above. `prompt` is a complete, self-contained instruction in English that a fresh Claude session could act on (names, links, numbers, file paths). It is not shown, so it can be long.
+- `todos`: 3 to 6 items, most urgent first. Optional `tag`: a short project or area name. `id` is a stable kebab-case slug from the subject, not from the date. `people` lists the humans involved with `name` and, when found, `avatar` (https URL). Include `url` (deep link into the source app) when you have one.
+- `updates`: 0 to 4 things that changed and the user should know but need not act on.
 - `events`: today's events, chronological, 24h `HH:MM`. `people` like todos. `prepPrompt` is a self-contained English instruction to prepare the user for that meeting. Not shown.
 - If a source is unreachable, leave its items out and add a short note in `notes` (plain string, English). Never invent items.
 
@@ -36,25 +63,26 @@ The brief is shown in a local web page. You produce ONE JSON file. Nothing else.
   "date": "2026-09-02",
   "weekday": "Wednesday",
   "generatedAt": "2026-09-02T07:31:00+02:00",
-  "summary": { "en": "Nearly empty Wednesday, one 10am huddle then a clear runway.", "fr": "Mercredi presque vide, un point à 10h puis la voie est libre." },
+  "summary": { "en": "Light Wednesday, one design sync at 10am then a clear runway.", "fr": "Mercredi léger, un point design à 10h puis la voie est libre." },
   "art": { "source": "met", "image": "https://images.metmuseum.org/...", "title": "For the Track", "artist": "John Frederick Peto", "date": "1895", "medium": "Oil on canvas", "link": "https://www.metmuseum.org/art/collection/search/...", "caption": "For the Track, John Frederick Peto, 1895. oil on canvas" },
   "focus": {
-    "title": { "en": "Draft the onboarding doc", "fr": "Rédiger le doc d'onboarding" },
-    "body": { "en": "Alex flagged this is blocking new hires; you own it.", "fr": "Alex a signalé que ça bloque les nouvelles recrues ; c'est pour toi." },
-    "prompt": "Draft a plan for ... (long, English, self-contained)"
+    "source": "linear",
+    "title": { "en": "Draft the Q3 roadmap doc", "fr": "Rédiger le doc de roadmap Q3" },
+    "body": { "en": "Priya asked for a first draft before Friday's planning review.", "fr": "Priya a demandé un premier jet avant la revue de vendredi." },
+    "prompt": "Draft a first version of the Q3 roadmap doc. Context: ... (long, English, self-contained)"
   },
   "todos": [
-    { "id": "answer-alex-on-access", "source": "slack", "url": "https://example.slack.com/archives/...",
-      "title": { "en": "Answer Alex on access request", "fr": "Répondre à Alex sur la demande d'accès" },
+    { "id": "answer-alex-on-access", "source": "slack", "url": "https://example.slack.com/archives/...", "tag": "Onboarding",
+      "title": { "en": "Answer Alex on the access request", "fr": "Répondre à Alex sur la demande d'accès" },
       "body": { "en": "Asked yesterday, Sam routed it to you, no reply yet.", "fr": "Demandé hier, Sam te l'a transmis, pas encore de réponse." },
-      "people": [ { "name": "Alex", "avatar": "https://avatars.slack-edge.com/..." }, { "name": "Sam" } ] }
+      "people": [ { "name": "Alex", "avatar": "https://..." }, { "name": "Sam" } ] }
   ],
   "updates": [
-    { "title": { "en": "...", "fr": "..." }, "tag": "Roadmap", "source": "slack", "url": "https://...",
+    { "title": { "en": "...", "fr": "..." }, "tag": "Roadmap", "source": "jira", "url": "https://...",
       "body": { "en": "...", "fr": "..." }, "people": [ { "name": "Jordan", "avatar": "https://..." } ] }
   ],
   "events": [
-    { "start": "10:00", "end": "10:15", "title": { "en": "...", "fr": "..." }, "body": { "en": "...", "fr": "..." },
+    { "start": "10:00", "end": "10:30", "source": "gcal", "title": { "en": "...", "fr": "..." }, "body": { "en": "...", "fr": "..." },
       "people": [ { "name": "Robin", "avatar": "https://..." } ], "url": "https://meet.google.com/...", "prepPrompt": "..." }
   ],
   "notes": []

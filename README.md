@@ -2,12 +2,15 @@
 
 ![Morning Brief](docs/screenshot.png)
 
-Your day on one page, every weekday morning: to-dos from Slack and Notion, your PRs, your calendar, one thing to push forward, and a painting. Generated locally by Claude Code, with your own Claude subscription. No API keys, no server, no account beyond Claude and the connectors you already use.
+Your day on one page, every weekday morning: what people are waiting on you for, what is due, what is on your calendar, one thing worth pushing forward, and a painting. Generated locally by Claude Code, with your own Claude subscription. No API keys, no server, no account beyond Claude and the apps you already use.
+
+It reads the apps *you* pick, and prioritises based on what *you* do. Slack or Teams, Google Calendar or Outlook, Notion, Jira, Linear, Asana, Confluence, GitHub, GitLab, Figma, HubSpot, and anything else you name. An engineer's brief leads with review requests and broken builds; a salesperson's leads with deals gone quiet and today's calls.
 
 ## You need
 
 - A Mac, with the Claude desktop app and Claude Code (any plan that includes Claude Code).
-- Node 20+ and the GitHub CLI (`gh`), logged in.
+- Node 20+. The GitHub CLI (`gh`) only if you want GitHub or GitLab in your brief.
+- The apps you want it to read, connected in the Claude app (Settings, then Connectors).
 - Any browser.
 
 ## Install in one prompt
@@ -18,19 +21,20 @@ Open Claude Code in the Claude desktop app and paste:
 Set up Morning Brief for me: clone https://github.com/thomasdqr/morning-brief, then read its SETUP.md and follow it step by step.
 ```
 
-Claude checks your machine, asks 3 short questions, installs a small local server, creates the daily task, and tells you what to click. About 5 minutes, most of it Claude working.
+Claude checks your machine, asks what you do and which apps to read, helps you connect any that are missing, installs a small local server, creates the daily routine, and walks you through the few clicks it cannot do for you. About 5 minutes, most of it Claude working.
 
 ## Manual install
 
 1. `git clone https://github.com/thomasdqr/morning-brief ~/Documents/GitHub/morning-brief`
 2. `~/Documents/GitHub/morning-brief/scripts/install.sh`
-3. Copy `config.example.json` to `data/config.json` and fill it in (name, email, browser, the repo folder for the yellow buttons).
+3. Copy `config.example.json` to `data/config.json` and fill it in: your name, your `profile` (what kind of work you do), and `tools` (the apps to read). Connect those apps in the Claude app first: Settings, then Connectors.
 4. In Claude Code Desktop, create a scheduled task named `morning-brief`, weekdays at 07:30, with the content of `TASK_PROMPT.md` as its prompt.
-5. Sidebar → Routines → open `morning-brief`, set its permission mode to Auto (pick a model there too if you want one), then **Run now**. Click **Allow** for each connector and file-access prompt once (remembered after).
+5. Sidebar → Routines → open `morning-brief`, set its permission mode to Auto (pick a model there too if you want one), then **Run now**. Click **Allow** for each app and file-access prompt once (remembered after).
 
 ## How it works
 
-- `PROMPT.md` is the editorial spec: what to read, how to write it, the JSON shape. A Claude Code Desktop scheduled task reads it every weekday morning and writes `data/briefs/YYYY-MM-DD.json`.
+- `PROMPT.md` is the editorial spec: a playbook per app, what to prioritise per profile, how to write it, the JSON shape. A Claude Code Desktop routine reads it every weekday morning and writes `data/briefs/YYYY-MM-DD.json`.
+- `data/config.json` is yours: name, `profile`, `tools`, browser. Change `tools` to add or drop an app, change `profile` to change what gets top billing.
 - `server.mjs` is a small Node server (no dependencies) that serves the page at `http://localhost:4747`, remembers checked to-dos, and picks the image of the day.
 - `public/index.html` is the page itself. Gear icon, top right: language and image source.
 - The yellow buttons open a new Claude Code session in the desktop app with the task pre-filled, so you review before anything runs.
@@ -41,5 +45,6 @@ Claude checks your machine, asks 3 short questions, installs a small local serve
 - Permission mode and model for the task are set once in its Edit form (Routines sidebar), not by the install script. Auto mode avoids an approval prompt on every Slack/Notion/Calendar call each morning.
 - A checked to-do is never proposed again.
 - Image sources: The Met, Cleveland Museum of Art, NASA picture of the day, Bing photo of the day, Unsplash (needs a free access key from unsplash.com/developers).
+- Tools without a bundled logo still work: the brief shows a small lettered badge instead.
 - Everything runs and stays on your machine. `data/` (your briefs, your settings) is never committed.
 - No telemetry, no external server beyond the public museum/photo APIs the brief pulls from.

@@ -1,64 +1,125 @@
 # Setup runbook (for Claude Code)
 
-You are installing Morning Brief on this Mac for the person talking to you. Do every step below, in order. Ask only when a step says so. Report what you did at the end in five lines or fewer.
+You are installing Morning Brief on this Mac for the person talking to you. They may not be a developer: never assume they know git, JSON, or the terminal. Do the steps in order, explain each manual click in plain words, and wait when a step says to wait. Report what you did at the end in five lines or fewer.
 
 Target folder: `~/Documents/GitHub/morning-brief` (call it `$DIR`). Repository: `https://github.com/thomasdqr/morning-brief`.
 
 ## 1. Check the machine
 
 - `uname` must be `Darwin`. If not, stop: Morning Brief is macOS only.
-- `node --version` must be 20 or newer. If node is missing, tell the user to install it from https://nodejs.org and stop.
-- `gh auth status` must be logged in. If not, tell the user to run `gh auth login` in a terminal, then continue once they confirm.
+- `node --version` must be 20 or newer. If node is missing, tell them to install it from https://nodejs.org, then stop.
 - `ls /Applications/Claude.app` must exist.
+- `gh auth status`: only needed if they pick GitHub in step 3. If it fails then, tell them to run `gh auth login` in a terminal.
 
-## 2. Check the connectors
+## 2. Who is this brief for
 
-Search your own tools (ToolSearch) for `slack`, `notion` and `calendar` tools. For each family that is missing, tell the user: open the Claude app, Settings, Connectors, connect it, then come back. Wait for confirmation before continuing. Slack and Notion are required; Google Calendar is strongly recommended but optional (the brief works without it).
+Ask with AskUserQuestion, one question at a time:
 
-## 3. Get the code
+1. Their first name.
+2. What kind of work they do, which decides what the brief prioritises. Offer: Engineering, Design, Product, Sales, Marketing, Support, Ops, Management. Map the answer to one of these `profile` values: `engineer`, `designer`, `product`, `sales`, `marketing`, `support`, `ops`, `management`, `other`.
+3. Their job title in their own words, for the `role` field (e.g. "Account Executive"). One short line.
+
+Get their email from `git config user.email`; if empty, ask.
+
+## 3. Which tools should the brief read
+
+Ask with AskUserQuestion, multiSelect, phrased as "Which apps should your brief look at each morning?". Offer the ones that match their profile first, and always include the chat and calendar options:
+
+| Offer | `tools` id |
+|---|---|
+| Slack | `slack` |
+| Microsoft Teams | `teams` |
+| Google Calendar | `gcal` |
+| Outlook (mail + calendar) | `outlook` |
+| Gmail | `gmail` |
+| Notion | `notion` |
+| Confluence | `confluence` |
+| Jira | `jira` |
+| Linear | `linear` |
+| Asana | `asana` |
+| GitHub | `github` |
+| GitLab | `gitlab` |
+| Figma | `figma` |
+| HubSpot | `hubspot` |
+
+Any other tool they name: use a lowercase one-word id. It still works, it just shows a lettered badge instead of a logo.
+
+A brief needs at least one source. Push back once if they pick none.
+
+## 4. Connect what is missing
+
+For each tool they picked, search your own tools (ToolSearch) for that name to see whether its connector is already available in this session. Then:
+
+- Tools already available: tell them which ones, in one line. Nothing to do.
+- Tools missing a connector: walk them through it, one at a time, in plain words:
+  1. Open the Claude app.
+  2. Go to Settings, then Connectors. In some versions this lives under the Customize panel, in the same list as extensions.
+  3. Find the tool, click Connect, and sign in when the browser opens.
+  4. Come back here and say done.
+
+  Then wait for their confirmation before continuing. Do not create the routine while a picked tool is unconnected: check again with ToolSearch after they confirm, and if it is still missing, offer to either retry or drop that tool from the list.
+
+Keep only the tools that are actually reachable in the final `tools` list, and tell them plainly which ones you dropped.
+
+## 5. Get the code
 
 - If `$DIR` does not exist: `git clone https://github.com/thomasdqr/morning-brief $DIR`.
 - If it exists and is a git repo: `git -C $DIR pull --ff-only`.
 
-## 4. Configure
+## 6. Configure
 
-Ask the user, one question at a time (use AskUserQuestion when available):
+Ask two last questions:
 
-1. Their first name.
-2. The browser to open the brief in, as the app name in /Applications (offer: the default browser, Dia, Arc, Google Chrome, Safari).
-3. A repo folder Claude should open when they click "Let's do it" (default to the current working directory if it looks like a git repo, otherwise ask).
+1. Which browser to open the brief in, as the app name in /Applications (offer: the default browser, Dia, Arc, Google Chrome, Safari). Empty means the system default.
+2. Only if they picked `github` or `gitlab`: which repo folder Claude should open when they click the yellow button. Default to the current working directory if it looks like a git repo. Otherwise leave `workdir` empty.
 
-Get their email from `git config user.email`; if empty, ask. Then write `$DIR/data/config.json` (create `$DIR/data` if needed):
+Write `$DIR/data/config.json` (create `$DIR/data` if needed):
 
 ```json
-{ "name": "<first name>", "email": "<email>", "role": "your role", "browser": "<browser or empty>", "workdir": "<absolute path>", "artSource": "met", "unsplashKey": "", "icsUrl": "" }
+{ "name": "<first name>", "email": "<email>", "role": "<their words>", "profile": "<profile id>", "tools": ["<tool ids they picked and that work>"], "browser": "<browser or empty>", "workdir": "<absolute path or empty>", "artSource": "met", "unsplashKey": "", "icsUrl": "" }
 ```
 
-## 5. Install the local server
+## 7. Install the local server
 
-Run `$DIR/scripts/install.sh`. It must print `server running: http://localhost:4747`. If it fails, read `/tmp/morning-brief.err` and fix.
+Run `$DIR/scripts/install.sh`. It must print `server running: http://localhost:4747`. If it fails, read `/tmp/morning-brief.err` and fix it. Explain in one line what it did: a small local server that shows the page and remembers which to-dos they ticked.
 
-## 6. Create the scheduled task
+## 8. Create the routine
 
 Use the scheduled-tasks tool (`create_scheduled_task`) with:
 
 - taskId `morning-brief`
 - cronExpression `30 7 * * 1-5`
-- description `Generate the Morning Brief from Slack, Notion, Calendar and GitHub, then open it in the browser.`
+- description `Generate the Morning Brief, then open it in the browser.`
 - prompt: the full content of `$DIR/TASK_PROMPT.md`, verbatim.
 
 If a task with that id already exists, update its prompt instead of creating a new one.
 
-Do NOT edit `~/.claude/settings.json` yourself, and do not tell the user to. It is not needed: step 7 below covers file-write approval the same way the connectors were approved in step 2.
+Do NOT try to edit `~/.claude.json` or `~/.claude/settings.json`. It is not needed, and Claude Code blocks an agent editing its own permission files.
 
-## 7. First run
+## 9. Walk them through the two settings you cannot set
 
-Permission mode and model are not set by `create_scheduled_task`; they live only in the task's own Edit form. Tell the user, in this order:
+Permission mode and model are not part of `create_scheduled_task`; they exist only in the routine's own Edit form. Say this, plainly:
 
-1. In the Claude app sidebar, section Routines, open `morning-brief` and switch its permission mode away from the default (which asks approval on every single tool call) to Auto. Pick a model there too if they want a specific one.
-2. Click **Run now**.
-3. The first run still asks to allow Slack, Notion, Calendar, and reading/writing files in the morning-brief folder, once each: click **Allow**. This is remembered for every next run of this task.
-4. In about five minutes the brief opens in their browser at http://localhost:4747.
-5. Claude Code Desktop must be open on weekday mornings. If it's closed, the brief is generated the next time it opens.
+1. In the Claude app sidebar, open **Routines** and click `morning-brief`.
+2. Set its permission mode to **Auto**. Explain why in one line: on the default setting it stops and asks permission for every single call to Slack, the calendar, and so on, which means dozens of clicks every morning.
+3. While there, pick the model they want it to use. Nothing is chosen for them.
 
-Then run `$DIR/scripts/open.sh` so they see the page now (it shows "No brief yet" until the first run finishes).
+Wait for them to say it is done.
+
+## 10. First run
+
+Then tell them, in this order:
+
+1. Still on the routine, click **Run now**.
+2. The first run asks permission a few times: once per connected app, and once to read and write files in the morning-brief folder. Click **Allow** each time. These are remembered for this routine, so tomorrow it runs silently.
+3. It takes about five minutes. When it finishes, the brief opens in their browser at http://localhost:4747.
+4. From then on it runs by itself every weekday at 07:30, as long as the Claude app is open. If the app is closed at that time, the brief is generated the next time they open it.
+
+Then run `$DIR/scripts/open.sh` so they see the page now. Warn them it says "No brief yet" until the first run finishes.
+
+## 11. Tell them how to change their mind
+
+Close with the two things they are most likely to want later:
+
+- The gear icon at the top right of the page: language, light or dark, and the daily image source.
+- To add or remove an app from the brief, or change what it prioritises: ask Claude to edit `data/config.json` in the morning-brief folder (`tools` and `profile`).
