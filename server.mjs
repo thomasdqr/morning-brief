@@ -142,6 +142,10 @@ const dayOfYear = (day) => Math.floor((new Date(`${day}T12:00:00Z`) - new Date(`
 const getJson = async (u, headers = {}) => { const r = await fetch(u, { headers }); if (!r.ok) throw new Error(`${u} -> ${r.status}`); return r.json(); };
 const headOk = async (u) => { try { const r = await fetch(u, { method: 'GET', headers: { Range: 'bytes=0-0' } }); return r.ok; } catch { return false; } };
 const clean = (v) => (v ?? '').toString().replace(/\s+/g, ' ').trim();
+// Some Unsplash photographers stuff their description with donation/contact spam
+// (PayPal, Venmo, "DM me on IG", etc). Fall back rather than showing that as the caption.
+const isSpammy = (text) => /paypal|venmo|cash ?app|patreon|buy me a coffee|donat(e|ion)|support my work|\bdm\b|\binstagram\.com\b|\big[:@]|\$\d/i.test(text);
+const cleanCaption = (text) => { const t = clean(text); return isSpammy(t) ? '' : t; };
 
 const fetchers = {
   async met(day) {
@@ -186,7 +190,7 @@ const fetchers = {
   async unsplash(day, config) {
     if (!config.unsplashKey) throw new Error('unsplash: missing access key');
     const o = await getJson('https://api.unsplash.com/photos/random?orientation=landscape&content_filter=high&topics=bo8jQKTaE0Y', { Authorization: `Client-ID ${config.unsplashKey}` });
-    const title = clean(o.description || o.alt_description || 'Untitled');
+    const title = cleanCaption(o.description) || cleanCaption(o.alt_description) || 'Untitled';
     return { image: `${o.urls.raw}&w=1800&q=80&fm=jpg`, title, artist: o.user.name, date: day, medium: 'photograph', link: `${o.links.html}?utm_source=morning_brief&utm_medium=referral`,
       caption: `${title}. Photo by ${o.user.name} on Unsplash` };
   },
