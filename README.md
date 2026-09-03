@@ -48,3 +48,7 @@ Claude checks your machine, asks what you do and which apps to read, helps you c
 - Tools without a bundled logo still work: the brief shows a small lettered badge instead.
 - Everything runs and stays on your machine. `data/` (your briefs, your settings) is never committed.
 - No telemetry, no external server beyond the public museum/photo APIs the brief pulls from.
+
+---
+
+<sub>Croissant icon by arista septiana dewi via [The Noun Project](https://thenounproject.com/icon/croissant-8252252/).</sub>
