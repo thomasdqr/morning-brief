@@ -38,7 +38,7 @@ Two different things cause that, and only one is a permission.
 
 Approvals are stored per exact command string, so a run that improvises shell commands never stops asking, and the Auto permission mode is not stored on the routine at all. The current prompt pins the run to two fixed commands for that reason.
 
-The other is the message "path is outside allowed working directories", which appears when the brief is written straight into the install folder. That is a guard, not a permission, so no approval ever settles it. Refreshing the routine prompt in step 4 fixes it: the brief is now written in the working directory and filed by `publish.mjs`.
+The other is a write prompt that returns no matter how often they click **always allow**. Two things cause that: writing outside the working directory trips a guard that is not a permission, and a routine's working directory is renamed every single day, so an approval stored against yesterday's path never matches today's. Neither is fixable by clicking. The rules from `scripts/allow.mjs` are, because they cover the install folder with wildcards and add it to `permissions.additionalDirectories`.
 
 The lasting fix for both is one command they run themselves, since it edits their own permission file and an agent must not:
 

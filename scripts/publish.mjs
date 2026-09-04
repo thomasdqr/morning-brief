@@ -14,14 +14,20 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const BRIEFS = path.join(ROOT, 'data', 'briefs');
 
+// The brief is normally written straight into data/briefs, which the standing rules
+// from scripts/allow.mjs make free. brief.json in the working directory is the
+// fallback for an install without those rules; note that a routine's working
+// directory is renamed every day, so no approval there can ever stick.
+const today = new Date().toLocaleDateString('en-CA');
 const candidates = [
   process.argv[2],
+  path.join(BRIEFS, `${today}.json`),
   path.join(process.cwd(), 'brief.json'),
 ].filter(Boolean);
 
 const source = candidates.find((f) => fs.existsSync(f));
 if (!source) {
-  console.error(`No brief found. Write it to "brief.json" in the current folder (${process.cwd()}), then run this again.`);
+  console.error(`No brief found. Expected ${path.join(BRIEFS, `${today}.json`)} or brief.json in ${process.cwd()}.`);
   process.exit(1);
 }
 
@@ -33,7 +39,7 @@ try {
   process.exit(1);
 }
 
-const date = /^\d{4}-\d{2}-\d{2}$/.test(brief.date ?? '') ? brief.date : new Date().toLocaleDateString('en-CA');
+const date = /^\d{4}-\d{2}-\d{2}$/.test(brief.date ?? '') ? brief.date : today;
 fs.mkdirSync(BRIEFS, { recursive: true });
 const target = path.join(BRIEFS, `${date}.json`);
 fs.writeFileSync(target, JSON.stringify(brief, null, 2));

@@ -17,7 +17,9 @@ The brief is shown in a local web page. You produce ONE JSON file. Nothing else.
 
 3. NEVER propose a to-do that appears in `alreadyDone`, by id or by a clearly identical subject. Reuse the ids in `openFromPreviousBrief` for anything still open, so ticking a box keeps working across days.
 
-4. Write the JSON to a file called exactly `brief.json` in your current working directory. Not into the install folder: writing outside your working directory trips a guard that is not a permission, so it asks a human every single time, and an unattended run has none. Copy the `art` object from step 1 into `art` as is.
+4. Write the JSON straight to the `writeBriefTo` path step 1 gave you, inside the install folder. Copy the `art` object from step 1 into `art` as is.
+
+   If that write asks for permission, this install has not run `scripts/allow.mjs` yet. Say so in your reply so the person can fix it once and for all, and for today write to `brief.json` in your working directory instead: step 5 picks it up either way. Never keep writing into the working directory as a habit, though, because it is renamed every day, so no approval there ever sticks.
 
 5. Run this one command, exactly as written:
 
@@ -25,7 +27,7 @@ The brief is shown in a local web page. You produce ONE JSON file. Nothing else.
    node <install>/scripts/publish.mjs
    ```
 
-   It checks your file parses, files it under `data/briefs/`, removes your temporary copy and opens the page. If it reports invalid JSON, fix `brief.json` and run it again.
+   It checks the brief parses, files it under `data/briefs/` if it is not already there, remembers any avatars it carries, and opens the page. If it reports invalid JSON, fix the file and run it again.
 
 ## Tool playbook
 

@@ -119,7 +119,7 @@ The model is not part of `create_scheduled_task`; it lives in the routine's own 
 
 Do not tell them to switch the permission mode to Auto and leave it there. That setting is not stored on the routine, so it does not survive to tomorrow. What does survive is the list of approvals the routine collects on its first run, and the brief is built so that list is short and stable: exactly two shell commands, always byte for byte the same, plus the connectors it reads. Approve those once and the routine stops asking.
 
-One trap worth knowing if they report a prompt that never goes away: a routine writing outside its own working directory hits "path is outside allowed working directories", which is a guard rather than a permission, so no approval can satisfy it. That is why the brief is written to `brief.json` in the working directory and filed by `publish.mjs`. If they see that message, their routine is on an older prompt: refresh it from `TASK_PROMPT.md`.
+One trap worth knowing if they report a write prompt that never goes away, even after clicking **always allow**: a routine's working directory is renamed every day, so an approval stored against one day's path cannot match the next. Step 8's rules are what settle it, by covering the install folder itself. If they skipped step 8, expect that prompt every morning.
 
 ## 11. First run
 

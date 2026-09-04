@@ -11,7 +11,7 @@ node <install>/scripts/collect.mjs
 node <install>/scripts/publish.mjs
 ```
 
-The first gives you everything local in one JSON: date, config, ticked-off to-dos, yesterday's open ids, today's artwork, the calendar fallback, and your pull requests. Write your brief to `brief.json` in your current working directory, never straight into the install folder, then the second validates it, files it and opens the page. Improvising any other shell command (`cat`, `curl`, `gh`, `python3`, `ls`) makes this run stop and ask for permission, which defeats an unattended routine. If you need something those two commands do not provide, use a connector or the Read tool, or leave it out and say so in `notes`.
+The first gives you everything local in one JSON: date, config, ticked-off to-dos, yesterday's open ids, today's artwork, the calendar fallback, and your pull requests. Write your brief straight to the `writeBriefTo` path the first command gives you; the standing permission rules make that free. Then the second command validates it, remembers any avatars and opens the page. Improvising any other shell command (`cat`, `curl`, `gh`, `python3`, `ls`) makes this run stop and ask for permission, which defeats an unattended routine. If you need something those two commands do not provide, use a connector or the Read tool, or leave it out and say so in `notes`.
 
 Rules that always apply:
 - Read the apps listed in `config.tools`, and only those. If one is configured but its connector is missing from this session, skip it and note it.
