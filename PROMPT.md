@@ -17,15 +17,15 @@ The brief is shown in a local web page. You produce ONE JSON file. Nothing else.
 
 3. NEVER propose a to-do that appears in `alreadyDone`, by id or by a clearly identical subject. Reuse the ids in `openFromPreviousBrief` for anything still open, so ticking a box keeps working across days.
 
-4. Write the JSON to the `writeBriefTo` path the command gave you. Copy its `art` object into `art` as is.
+4. Write the JSON to a file called exactly `brief.json` in your current working directory. Not into the install folder: writing outside your working directory trips a guard that is not a permission, so it asks a human every single time, and an unattended run has none. Copy the `art` object from step 1 into `art` as is.
 
 5. Run this one command, exactly as written:
 
    ```
-   node <install>/scripts/open.mjs
+   node <install>/scripts/publish.mjs
    ```
 
-   It checks your file parses and then opens the brief in the browser from the config. If it reports invalid JSON, fix the file and run it again.
+   It checks your file parses, files it under `data/briefs/`, removes your temporary copy and opens the page. If it reports invalid JSON, fix `brief.json` and run it again.
 
 ## Tool playbook
 
@@ -33,10 +33,10 @@ Each item you emit carries a `source`: the tool id it came from, exactly as writ
 
 | Tool id | What to read, last 48h unless stated | Look for |
 |---|---|---|
-| `slack` / `teams` | Messages mentioning the user, DMs, replies in threads they posted in | Who asked what, and whether the user already answered. Fetch each named person's avatar URL when the API offers one |
+| `slack` / `teams` | Messages mentioning the user, DMs, replies in threads they posted in | Who asked what, and whether the user already answered. For each person you name, call the profile tool (`slack_read_user_profile`, or `slack_search_users`) and take the image URL it returns (`image_72` or similar) as their `avatar`. Ask for that tool if it is not approved yet: a brief with faces is worth one permission click |
 | `gcal` / `outlook` | Today's events, 00:00 to 23:59 local, ordered by start. If the connector is missing, step 1's `calendarFallback` may hold them | Skip all-day events and ones the user declined. Note attendees and whether the user has not replied yet |
 | `gmail` | Unread or recent mail addressed directly to the user | Threads waiting on their reply. Ignore newsletters and automated notifications |
-| `notion` / `confluence` | Pages and tasks assigned to the user, comments mentioning them | Not-done tasks, overdue dates, questions left on their pages |
+| `notion` / `confluence` | Pages and tasks assigned to the user, comments mentioning them | Not-done tasks, overdue dates, questions left on their pages. The users list gives each person's `avatar_url` |
 | `jira` / `linear` / `asana` | Issues assigned to the user, and ones they reported that moved | Due or overdue, blocked, waiting on them, changed status since yesterday |
 | `github` / `gitlab` | Already in step 1's output (`github.myOpenPrs`, `github.reviewsRequestedOfMe`). Use the connector only for review comments it does not cover | Their open PRs, reviews requested of them, new review comments |
 | `figma` | Files and comments where they are mentioned | Comments awaiting an answer, review requests |

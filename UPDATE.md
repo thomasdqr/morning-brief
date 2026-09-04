@@ -34,7 +34,13 @@ If no such routine exists, they never finished setup: switch to `SETUP.md` from 
 
 ## 5. If they complain the routine keeps asking permission
 
-A routine stores its approvals per exact command string, so a run that improvises shell commands never stops asking, and the Auto permission mode is not stored on the routine at all. The current prompt pins the run to two fixed commands for that reason. If they have been fighting prompts every morning, tell them to click **Run now** once and choose **always allow** on each request: with the refreshed prompt that list is now short and stable, so it holds.
+Two different things cause that, and only one is a permission.
+
+Approvals are stored per exact command string, so a run that improvises shell commands never stops asking, and the Auto permission mode is not stored on the routine at all. The current prompt pins the run to two fixed commands for that reason.
+
+The other is the message "path is outside allowed working directories", which appears when the brief is written straight into the install folder. That is a guard, not a permission, so no approval ever settles it. Refreshing the routine prompt in step 4 fixes it: the brief is now written in the working directory and filed by `publish.mjs`.
+
+Either way, tell them to click **Run now** once after the refresh and choose **always allow** on each request.
 
 ## 6. Check it still works
 

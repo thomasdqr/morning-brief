@@ -8,14 +8,15 @@ Only two shell commands are allowed in this run, exactly as written, no variatio
 
 ```
 node <install>/scripts/collect.mjs
-node <install>/scripts/open.mjs
+node <install>/scripts/publish.mjs
 ```
 
-The first gives you everything local in one JSON: date, config, ticked-off to-dos, yesterday's open ids, today's artwork, the calendar fallback, and your pull requests. The second validates what you wrote and opens the page. Improvising any other shell command (`cat`, `curl`, `gh`, `python3`, `ls`) makes this run stop and ask for permission, which defeats an unattended routine. If you need something those two commands do not provide, use a connector or the Read tool, or leave it out and say so in `notes`.
+The first gives you everything local in one JSON: date, config, ticked-off to-dos, yesterday's open ids, today's artwork, the calendar fallback, and your pull requests. Write your brief to `brief.json` in your current working directory, never straight into the install folder, then the second validates it, files it and opens the page. Improvising any other shell command (`cat`, `curl`, `gh`, `python3`, `ls`) makes this run stop and ask for permission, which defeats an unattended routine. If you need something those two commands do not provide, use a connector or the Read tool, or leave it out and say so in `notes`.
 
 Rules that always apply:
 - Read the apps listed in `config.tools`, and only those. If one is configured but its connector is missing from this session, skip it and note it.
 - Read-only on every external service. Never send a message, never edit or assign a task, never comment, never create or change a calendar event.
 - Never propose a to-do that appears in the `alreadyDone` list from the first command, by id or by an equivalent subject.
 - If a source is unreachable, skip it and note it in the `notes` array. Never invent items.
-- Reply with one line: the path written, the number of to-dos, the number of events.
+- Name people with their avatar when the connector offers one: for Slack that is the profile tool, for Notion the users list. Ask for it if it is not approved yet.
+- Reply with one line: the path filed, the number of to-dos, the number of events.
