@@ -2,66 +2,55 @@
 
 ![Morning Brief](docs/screenshot.png)
 
-Your day on one page, every weekday morning: what people are waiting on you for, what is due, what is on your calendar, one thing worth pushing forward, and a painting. Generated locally by Claude Code, with your own Claude subscription. No API keys, no server, no account beyond Claude and the apps you already use.
+**Your day on one page, every weekday morning.** Who is waiting on you, what is due, what is on your calendar, the one thing worth pushing forward, and a painting to wake up to.
 
-It reads the apps *you* pick, and prioritises based on what *you* do. Slack or Teams, Google Calendar or Outlook, Notion, Jira, Linear, Asana, Confluence, GitHub, GitLab, Figma, HubSpot, and anything else you name. An engineer's brief leads with review requests and broken builds; a salesperson's leads with deals gone quiet and today's calls.
+It reads the apps you already use, and leads with what matters for *your* job. Slack or Teams, your calendar, Notion, Jira, Linear, GitHub, Figma, HubSpot, whatever you name. An engineer opens theirs to review requests and broken builds. A salesperson opens theirs to deals gone quiet and today's calls.
 
-## You need
+It runs on your own machine, on your own Claude subscription. No API keys, no accounts, nothing leaves your laptop.
 
-- macOS, Linux or Windows, with the Claude desktop app and Claude Code (any plan that includes Claude Code).
-- Node 20+ and git. The GitHub CLI (`gh`) only if you want GitHub or GitLab in your brief.
-- The apps you want it to read, connected in the Claude app (Settings, then Connectors).
-- Any browser.
+## Install it in one prompt
 
-## Install in one prompt
-
-Open Claude Code in the Claude desktop app and paste:
+Open Claude Code in the Claude desktop app and paste this:
 
 ```
 Set up Morning Brief for me: clone https://github.com/thomasdqr/morning-brief, then read its SETUP.md and follow it step by step.
 ```
 
-Claude checks your machine, asks what you do and which apps to read, helps you connect any that are missing, installs a small local server, creates the daily routine, and walks you through the few clicks it cannot do for you. About 5 minutes, most of it Claude working.
+Claude asks what you do and which apps to read, connects the ones you are missing, sets everything up, and tells you the two or three things only you can click. About five minutes, most of it Claude working while you watch.
 
-## Update in one prompt
-
-Already installed? Paste this in Claude Code:
-
-```
-Update Morning Brief for me: run `git -C ~/Documents/GitHub/morning-brief pull`, then read UPDATE.md in that folder and follow it step by step.
-```
-
-Your briefs and settings live in `data/`, which git never touches. Claude pulls the new code, restarts the local server, adds any config field the new version expects, and refreshes the routine's prompt. That last one matters: the routine keeps its own copy of the prompt, so a plain `git pull` leaves it on the old instructions.
-
-If you prefer the terminal, `node scripts/update.mjs` does the code and the server, then tells you what is left for Claude.
-
-## Manual install
-
-1. `git clone https://github.com/thomasdqr/morning-brief ~/Documents/GitHub/morning-brief`
-2. `node ~/Documents/GitHub/morning-brief/scripts/install.mjs`
-3. Copy `config.example.json` to `data/config.json` and fill it in: your name, your `profile` (what kind of work you do), and `tools` (the apps to read). Connect those apps in the Claude app first: Settings, then Connectors.
-4. In Claude Code Desktop, create a scheduled task named `morning-brief`, weekdays at 07:30, with the content of `TASK_PROMPT.md` as its prompt.
-5. Sidebar → Routines → open `morning-brief`, pick a model, then **Run now** and stay for a minute: choose **always allow** on each request it makes. That first run is what makes every later one silent.
-
-## How it works
-
-- `PROMPT.md` is the editorial spec: a playbook per app, what to prioritise per profile, how to write it, the JSON shape. A Claude Code Desktop routine reads it every weekday morning and writes `data/briefs/YYYY-MM-DD.json`.
-- `data/config.json` is yours: name, `profile`, `tools`, browser. Change `tools` to add or drop an app, change `profile` to change what gets top billing.
-- `server.mjs` is a small Node server (no dependencies) that serves the page at `http://localhost:4747`, remembers checked to-dos, and picks the image of the day. `scripts/install.mjs` keeps it running the way each OS expects: a launchd agent, a systemd user service, or a Startup entry.
-- `public/index.html` is the page itself. Gear icon, top right: language and image source.
-- The yellow buttons open a new Claude Code session in the desktop app with the task pre-filled, so you review before anything runs.
+You need a Mac, Windows or Linux machine, the Claude desktop app with Claude Code, and Node 20+.
 
 ## Good to know
 
-- Claude Code Desktop must be open on weekday mornings for the task to fire. If it's closed, the brief is generated the next time you open it.
-- The routine asks permission on its first run only, if you answer **always allow**. Its approvals are stored per exact command, which is why the whole morning run is pinned to two unchanging commands (`collect.mjs` gathers everything local, `open.mjs` validates and opens). Setting the permission mode to Auto is not a fix: that choice is not stored on the routine.
-- The small line at the very bottom of the page says which version you are on and whether it is current: `v16 · up to date`, or `v13 → v16 · click to update` in yellow. Clicking that hands the update to Claude. The version is the commit count, so there is nothing to bump by hand.
-- A checked to-do is never proposed again.
-- Image sources: The Met, Cleveland Museum of Art, NASA picture of the day, Bing photo of the day, Unsplash (needs a free access key from unsplash.com/developers).
-- Tools without a bundled logo still work: the brief shows a small lettered badge instead.
-- Everything runs and stays on your machine. `data/` (your briefs, your settings) is never committed.
-- On Windows, run Claude Code natively rather than under WSL: connectors are not available there.
-- No telemetry, no external server beyond the public museum/photo APIs the brief pulls from.
+- It fires every weekday at 7:30, as long as the Claude app is open. Closed at the time? Your brief is waiting the next time you open it.
+- Tick a to-do and it never comes back the next day.
+- Gear icon, top right: language, light or dark, and where the daily picture comes from.
+- The little line at the very bottom tells you when a new version is out. Click it and Claude updates you.
+- The first morning it asks permission a handful of times. Answer **always allow** and it never asks again.
+
+<details>
+<summary>For the curious: what is actually on your machine, and how to install by hand</summary>
+
+Four files do the work:
+
+- `PROMPT.md` is the editorial brain: a playbook per app, what to lead with per profile, the writing rules, the JSON shape. A Claude Code routine reads it each morning and writes `data/briefs/YYYY-MM-DD.json`.
+- `data/config.json` is yours: your name, your `profile` (what kind of work you do), `tools` (which apps to read), your browser. Change those two lists and the brief changes with them.
+- `server.mjs` is a dependency-free Node server on `http://localhost:4747`. It serves the page, remembers what you ticked, and picks the picture. `scripts/install.mjs` keeps it alive the way each OS expects: a launchd agent, a systemd user service, or a Startup entry.
+- `public/index.html` is the page. The yellow buttons open a fresh Claude Code session with the task written out, so you always review before anything runs.
+
+Manual install:
+
+1. `git clone https://github.com/thomasdqr/morning-brief ~/Documents/GitHub/morning-brief`
+2. `node ~/Documents/GitHub/morning-brief/scripts/install.mjs`
+3. Copy `config.example.json` to `data/config.json` and fill in `name`, `profile` and `tools`. Connect those apps in the Claude app first: Settings, then Connectors.
+4. In Claude Code, create a routine named `morning-brief`, weekdays at 07:30, with the content of `TASK_PROMPT.md` as its prompt.
+5. Routines → `morning-brief` → pick a model → **Run now**, and answer **always allow** to each request. That first run is what makes every later one silent.
+
+Two details worth knowing if something misbehaves: the routine keeps its own copy of the prompt, so `git pull` alone leaves it on old instructions (`UPDATE.md` handles that), and on Windows you want Claude Code running natively rather than under WSL, where connectors are unavailable.
+
+Picture sources: The Met, Cleveland Museum of Art, NASA, Bing, or Unsplash with a free key. An app with no bundled logo still works, it just shows a lettered badge.
+
+</details>
 
 ---
 
