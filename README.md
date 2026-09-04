@@ -26,7 +26,7 @@ You need a Mac, Windows or Linux machine, the Claude desktop app with Claude Cod
 - Tick a to-do and it never comes back the next day.
 - Gear icon, top right: language, light or dark, and where the daily picture comes from.
 - The little line at the very bottom tells you when a new version is out. Click it and Claude updates you.
-- The first morning it asks permission a handful of times. Answer **always allow** and it never asks again.
+- Tired of it asking permission every morning? Run `node scripts/allow.mjs --yes` once and it stops for good.
 
 <details>
 <summary>For the curious: what is actually on your machine, and how to install by hand</summary>

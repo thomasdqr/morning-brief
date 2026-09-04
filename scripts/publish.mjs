@@ -39,7 +39,23 @@ const target = path.join(BRIEFS, `${date}.json`);
 fs.writeFileSync(target, JSON.stringify(brief, null, 2));
 if (path.resolve(source) !== path.resolve(target)) fs.rmSync(source, { force: true });
 
-console.log(`filed ${target} (${brief.todos?.length ?? 0} to-dos, ${brief.events?.length ?? 0} events)`);
+// Keep every avatar this brief carried, so a later run that forgets to look one up
+// still shows the face.
+const PEOPLE = path.join(ROOT, 'data', 'people.json');
+let known = {};
+try { known = JSON.parse(fs.readFileSync(PEOPLE, 'utf8')); } catch {}
+let learned = 0;
+for (const item of [brief.focus, ...(brief.todos ?? []), ...(brief.updates ?? []), ...(brief.events ?? [])]) {
+  for (const p of item?.people ?? []) {
+    const key = String(p?.name ?? '').trim().toLowerCase();
+    if (!key || !p?.avatar || known[key]?.avatar === p.avatar) continue;
+    known[key] = { name: p.name, avatar: p.avatar, seen: new Date().toISOString() };
+    learned++;
+  }
+}
+if (learned) fs.writeFileSync(PEOPLE, JSON.stringify(known, null, 2));
+
+console.log(`filed ${target} (${brief.todos?.length ?? 0} to-dos, ${brief.events?.length ?? 0} events, ${learned} new avatar${learned === 1 ? '' : 's'} remembered, ${Object.keys(known).length} known)`);
 
 const open = spawn(process.execPath, [path.join(ROOT, 'scripts', 'open.mjs')], { detached: true, stdio: 'ignore' });
 open.unref();

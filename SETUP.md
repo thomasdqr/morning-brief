@@ -84,7 +84,21 @@ Write `$DIR/data/config.json` (create `$DIR/data` if needed):
 
 Run `node $DIR/scripts/install.mjs`. It must print `server running: http://localhost:4747`. It picks the right mechanism per platform: a launchd agent on macOS, a systemd user service on Linux, a Startup entry on Windows. If it fails, it prints the command to run the server in the foreground so you can see the real error. Explain in one line what it did: a small local server that shows the page and remembers which to-dos they ticked.
 
-## 8. Create the routine
+## 8. Hand them the one command that stops the asking
+
+You cannot do this step: it edits `~/.claude/settings.json`, their own permission file, and an agent must not grant itself permissions. Show them the command and let them run it:
+
+```
+node $DIR/scripts/allow.mjs --yes
+```
+
+Explain what it does in one line: it gives the morning routine standing permission for its own folder and its two commands, so it never has to wake them up for it. Without `--yes` it only prints what it would add. It keeps a backup and removes nothing.
+
+Why it is needed, if they ask: a routine's own approvals are stored per exact command, so anything that varies asks again; and writing outside its working folder trips a guard that no approval can satisfy. The rules this adds use wildcards and `permissions.additionalDirectories`, which settle both for good. User settings apply to routine runs, which is what makes this stick.
+
+Wait for them to say it is done.
+
+## 9. Create the routine
 
 Use the scheduled-tasks tool (`create_scheduled_task`) with:
 
@@ -97,7 +111,7 @@ If a task with that id already exists, update its prompt instead of creating a n
 
 Do NOT try to edit `~/.claude.json` or `~/.claude/settings.json`. It is not needed, and Claude Code blocks an agent editing its own permission files.
 
-## 9. The model, and why the first run matters
+## 10. The model, and why the first run matters
 
 The model is not part of `create_scheduled_task`; it lives in the routine's own Edit form. Tell them: in the Claude app sidebar, open **Routines**, click `morning-brief`, and pick the model they want it to use. Nothing is chosen for them.
 
@@ -105,19 +119,19 @@ Do not tell them to switch the permission mode to Auto and leave it there. That 
 
 One trap worth knowing if they report a prompt that never goes away: a routine writing outside its own working directory hits "path is outside allowed working directories", which is a guard rather than a permission, so no approval can satisfy it. That is why the brief is written to `brief.json` in the working directory and filed by `publish.mjs`. If they see that message, their routine is on an older prompt: refresh it from `TASK_PROMPT.md`.
 
-## 10. First run
+## 11. First run
 
 Tell them, in this order:
 
 1. Still on the routine, click **Run now**, and stay for a minute: this is the run that teaches it what it may do.
-2. It will ask a handful of times: once per connected app, once to read the morning-brief folder, and once for each of its two commands (`collect.mjs` and `publish.mjs`). Choose the **always allow** option every time, not the one-off allow: that is what makes tomorrow silent. Avatars need the Slack profile tool, so approve that one too when it appears.
+2. With step 8 done, it should only ask about the connected apps, once each. Choose the **always allow** option every time, not the one-off allow: that is what makes tomorrow silent. Avatars need the Slack profile tool, so approve that one too when it appears.
 3. It takes about five minutes. When it finishes, the brief opens in their browser at http://localhost:4747.
 4. From then on it runs by itself every weekday at 07:30, as long as the Claude app is open. If the app is closed at that time, the brief is generated the next time they open it.
 5. If a later run does stop and ask for something new, approving it with **always allow** settles it for good.
 
 Then run `node $DIR/scripts/open.mjs` so they see the page now. Warn them it says "No brief yet" until the first run finishes.
 
-## 11. Tell them how to change their mind
+## 12. Tell them how to change their mind
 
 Close with the two things they are most likely to want later:
 

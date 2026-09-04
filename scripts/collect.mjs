@@ -44,6 +44,7 @@ const out = {
   config: { name: config.name, role: config.role, profile: config.profile, tools, workdir: config.workdir },
   alreadyDone: Object.entries(state.done ?? {}).map(([id, v]) => ({ id, title: v?.title })),
   openFromPreviousBrief: (previous?.todos ?? []).map((t) => ({ id: t.id, title: t.title?.en ?? t.title })),
+  knownPeople: Object.values(readJson(path.join(DATA, 'people.json'), {})).map((p) => p.name),
   art: await get('/api/art'),
   calendarFallback: tools.some((t) => t === 'gcal' || t === 'outlook') ? await get('/api/calendar') : null,
 };

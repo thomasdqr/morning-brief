@@ -40,7 +40,13 @@ Approvals are stored per exact command string, so a run that improvises shell co
 
 The other is the message "path is outside allowed working directories", which appears when the brief is written straight into the install folder. That is a guard, not a permission, so no approval ever settles it. Refreshing the routine prompt in step 4 fixes it: the brief is now written in the working directory and filed by `publish.mjs`.
 
-Either way, tell them to click **Run now** once after the refresh and choose **always allow** on each request.
+The lasting fix for both is one command they run themselves, since it edits their own permission file and an agent must not:
+
+```
+node $DIR/scripts/allow.mjs --yes
+```
+
+It grants the routine standing permission for its folder and its commands, using wildcards and `permissions.additionalDirectories` rather than the per-command approvals that keep expiring. Then tell them to click **Run now** once and choose **always allow** for each connected app.
 
 ## 6. Check it still works
 

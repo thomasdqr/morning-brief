@@ -218,6 +218,38 @@ const repoSlug = async () => {
   return m ? m[1] : null;
 };
 
+
+// Avatars, remembered. Asking the agent to look up every face every morning is a
+// coin flip: half the briefs came back with none. So every avatar that reaches a
+// brief is kept here, and any brief missing one gets it filled back in. A face has
+// to be found once, ever.
+const PEOPLE = path.join(DATA, 'people.json');
+const peopleKey = (name) => String(name ?? '').trim().toLowerCase();
+const rememberPeople = (brief) => {
+  const known = readJson(PEOPLE, {});
+  let added = 0;
+  for (const item of [brief?.focus, ...(brief?.todos ?? []), ...(brief?.updates ?? []), ...(brief?.events ?? [])]) {
+    for (const p of item?.people ?? []) {
+      const key = peopleKey(p?.name);
+      if (!key || !p?.avatar || known[key]?.avatar === p.avatar) continue;
+      known[key] = { name: p.name, avatar: p.avatar, seen: new Date().toISOString() };
+      added++;
+    }
+  }
+  if (added) writeJson(PEOPLE, known);
+  return added;
+};
+const fillAvatars = (brief) => {
+  const known = readJson(PEOPLE, {});
+  if (!Object.keys(known).length) return brief;
+  for (const item of [brief?.focus, ...(brief?.todos ?? []), ...(brief?.updates ?? []), ...(brief?.events ?? [])]) {
+    for (const p of item?.people ?? []) {
+      if (p && !p.avatar && known[peopleKey(p.name)]) p.avatar = known[peopleKey(p.name)].avatar;
+    }
+  }
+  return brief;
+};
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
@@ -290,6 +322,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && url.pathname === '/api/brief') {
     const brief = latestBrief();
+    if (brief) { rememberPeople(brief); fillAvatars(brief); }
     const state = readJson(STATE, { done: {} });
     const config = readJson(CONFIG, {});
     return send(res, 200, { brief, done: state.done, briefDir: ROOT, name: config.name || '', tools: Array.isArray(config.tools) ? config.tools : [], workdir: config.workdir || os.homedir() });
