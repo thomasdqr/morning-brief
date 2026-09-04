@@ -86,11 +86,13 @@ Run `node $DIR/scripts/install.mjs`. It must print `server running: http://local
 
 ## 8. Hand them the one command that stops the asking
 
-You cannot do this step: it edits `~/.claude/settings.json`, their own permission file, and an agent must not grant itself permissions. Show them the command and let them run it:
+You cannot do this step: it edits `~/.claude/settings.json`, their own permission file, and an agent must not grant itself permissions, directly or through a script it runs. Step 7's installer already printed the exact command if it is needed. Repeat it to them and let them run it:
 
 ```
 node $DIR/scripts/allow.mjs --yes
 ```
+
+If the installer printed nothing about permissions, the rules are already there: say so and move on.
 
 Explain what it does in one line: it gives the morning routine standing permission for its own folder and its two commands, so it never has to wake them up for it. Without `--yes` it only prints what it would add. It keeps a backup and removes nothing.
 

@@ -108,6 +108,25 @@ for (let i = 0; i < 12 && !(await alive()); i++) await new Promise((r) => setTim
 
 if (await alive()) {
   console.log(`server running: http://localhost:${PORT} (${how})`);
+  // Surface the one command a human has to run, so nobody has to hunt for it.
+  // Deliberately not done here: it edits ~/.claude/settings.json, and that file is
+  // the user's to change, not an installer's.
+  const settings = path.join(os.homedir(), '.claude', 'settings.json');
+  let granted = false;
+  try {
+    const perms = JSON.parse(fs.readFileSync(settings, 'utf8')).permissions ?? {};
+    granted = (perms.additionalDirectories ?? []).includes(ROOT);
+  } catch {}
+  if (!granted) {
+    console.log(`
+One more thing, and it is yours to run: give the morning routine standing
+permission for this folder, so it never wakes you up asking.
+
+    node ${path.join(ROOT, 'scripts', 'allow.mjs')} --yes
+
+Without it the routine stops and asks every morning. Drop --yes to see what it
+would add first.`);
+  }
 } else {
   console.error(`server did not start (${how}).`);
   console.error(`Try running it in the foreground to see why: "${NODE}" "${SERVER}"`);
