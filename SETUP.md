@@ -97,24 +97,21 @@ If a task with that id already exists, update its prompt instead of creating a n
 
 Do NOT try to edit `~/.claude.json` or `~/.claude/settings.json`. It is not needed, and Claude Code blocks an agent editing its own permission files.
 
-## 9. Walk them through the two settings you cannot set
+## 9. The model, and why the first run matters
 
-Permission mode and model are not part of `create_scheduled_task`; they exist only in the routine's own Edit form. Say this, plainly:
+The model is not part of `create_scheduled_task`; it lives in the routine's own Edit form. Tell them: in the Claude app sidebar, open **Routines**, click `morning-brief`, and pick the model they want it to use. Nothing is chosen for them.
 
-1. In the Claude app sidebar, open **Routines** and click `morning-brief`.
-2. Set its permission mode to **Auto**. Explain why in one line: on the default setting it stops and asks permission for every single call to Slack, the calendar, and so on, which means dozens of clicks every morning.
-3. While there, pick the model they want it to use. Nothing is chosen for them.
-
-Wait for them to say it is done.
+Do not tell them to switch the permission mode to Auto and leave it there. That setting is not stored on the routine, so it does not survive to tomorrow. What does survive is the list of approvals the routine collects on its first run, and the brief is built so that list is short and stable: exactly two shell commands, always byte for byte the same, plus the connectors and the folder it reads and writes. Approve those once and the routine stops asking.
 
 ## 10. First run
 
-Then tell them, in this order:
+Tell them, in this order:
 
-1. Still on the routine, click **Run now**.
-2. The first run asks permission a few times: once per connected app, and once to read and write files in the morning-brief folder. Click **Allow** each time. These are remembered for this routine, so tomorrow it runs silently.
+1. Still on the routine, click **Run now**, and stay for a minute: this is the run that teaches it what it may do.
+2. It will ask a handful of times: once per connected app, once for reading and writing files in the morning-brief folder, and once for each of its two commands (`collect.mjs` and `open.mjs`). Choose the **always allow** option every time, not the one-off allow: that is what makes tomorrow silent.
 3. It takes about five minutes. When it finishes, the brief opens in their browser at http://localhost:4747.
 4. From then on it runs by itself every weekday at 07:30, as long as the Claude app is open. If the app is closed at that time, the brief is generated the next time they open it.
+5. If a later run does stop and ask for something new, approving it with **always allow** settles it for good.
 
 Then run `node $DIR/scripts/open.mjs` so they see the page now. Warn them it says "No brief yet" until the first run finishes.
 

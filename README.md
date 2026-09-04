@@ -41,7 +41,7 @@ If you prefer the terminal, `node scripts/update.mjs` does the code and the serv
 2. `node ~/Documents/GitHub/morning-brief/scripts/install.mjs`
 3. Copy `config.example.json` to `data/config.json` and fill it in: your name, your `profile` (what kind of work you do), and `tools` (the apps to read). Connect those apps in the Claude app first: Settings, then Connectors.
 4. In Claude Code Desktop, create a scheduled task named `morning-brief`, weekdays at 07:30, with the content of `TASK_PROMPT.md` as its prompt.
-5. Sidebar → Routines → open `morning-brief`, set its permission mode to Auto (pick a model there too if you want one), then **Run now**. Click **Allow** for each app and file-access prompt once (remembered after).
+5. Sidebar → Routines → open `morning-brief`, pick a model, then **Run now** and stay for a minute: choose **always allow** on each request it makes. That first run is what makes every later one silent.
 
 ## How it works
 
@@ -54,7 +54,7 @@ If you prefer the terminal, `node scripts/update.mjs` does the code and the serv
 ## Good to know
 
 - Claude Code Desktop must be open on weekday mornings for the task to fire. If it's closed, the brief is generated the next time you open it.
-- Permission mode and model for the task are set once in its Edit form (Routines sidebar), not by the install script. Auto mode avoids an approval prompt on every Slack/Notion/Calendar call each morning.
+- The routine asks permission on its first run only, if you answer **always allow**. Its approvals are stored per exact command, which is why the whole morning run is pinned to two unchanging commands (`collect.mjs` gathers everything local, `open.mjs` validates and opens). Setting the permission mode to Auto is not a fix: that choice is not stored on the routine.
 - The small line at the very bottom of the page says which version you are on and whether it is current: `v16 · up to date`, or `v13 → v16 · click to update` in yellow. Clicking that hands the update to Claude. The version is the commit count, so there is nothing to bump by hand.
 - A checked to-do is never proposed again.
 - Image sources: The Met, Cleveland Museum of Art, NASA picture of the day, Bing photo of the day, Unsplash (needs a free access key from unsplash.com/developers).

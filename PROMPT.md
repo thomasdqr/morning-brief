@@ -5,12 +5,27 @@ The brief is shown in a local web page. You produce ONE JSON file. Nothing else.
 
 ## Steps
 
-1. Compute today's date in the machine's local timezone. `DATE` = `YYYY-MM-DD`. `WEEKDAY` = English weekday name.
-2. Read `<install>/data/state.json` if it exists. Its `done` map lists to-dos the user already checked off (id -> {title, doneAt}). NEVER propose a to-do again if its `id` or a clearly identical subject is in `done`.
-3. Read the previous brief, the most recent file in `<install>/data/briefs/`, if any. Reuse the same `id` for a to-do that is still open, so state carries over.
-4. Gather signals from the tools in `config.tools`, and only those. Read-only: never post, send, assign, comment, or modify anything anywhere. Use the playbook below. If a tool is configured but its connector is missing from this session, skip it and say so in `notes`. If `config.tools` is missing or empty (a config written before tools existed), fall back to every chat, calendar and task connector you do have, and say so in `notes` so the reader knows to set it. Same for a missing `profile`: use the `other` rules.
-5. Artwork: run `curl -s http://localhost:4747/api/art` in Bash and copy the returned object into `art` as is (it already honours the image source chosen in the page settings). If the call fails, retry once, then leave `art` out and note it in `notes`.
-6. Write the JSON to `<install>/data/briefs/DATE.json`. Validate it parses: `node -e "JSON.parse(require('fs').readFileSync(process.argv[1]))" <the file>`. Then run `node <install>/scripts/open.mjs`, which opens the brief in the browser set in config.
+1. Run this one command, exactly as written, and read its JSON output:
+
+   ```
+   node <install>/scripts/collect.mjs
+   ```
+
+   It hands you everything this machine can tell you: today's date and weekday, the person's config (`name`, `role`, `profile`, `tools`), the to-dos they already ticked off, the ids of to-dos still open from yesterday, the artwork for today, the calendar fallback if a calendar is configured, and their open pull requests and review requests if a git forge is configured. Do not re-read those files yourself, and do not run `gh`, `curl` or `cat` on your own: this command is approved once and then never asks again, whereas every improvised shell command asks for permission and stalls the run.
+
+2. Gather what only the connectors can give you: the apps in `config.tools`, and only those. Read-only: never post, send, assign, comment, or modify anything anywhere. Use the playbook below. If a tool is configured but its connector is missing from this session, skip it and say so in `notes`. If `config.tools` is missing or empty (a config written before tools existed), fall back to every chat, calendar and task connector you do have, and say so in `notes`. Same for a missing `profile`: use the `other` rules.
+
+3. NEVER propose a to-do that appears in `alreadyDone`, by id or by a clearly identical subject. Reuse the ids in `openFromPreviousBrief` for anything still open, so ticking a box keeps working across days.
+
+4. Write the JSON to the `writeBriefTo` path the command gave you. Copy its `art` object into `art` as is.
+
+5. Run this one command, exactly as written:
+
+   ```
+   node <install>/scripts/open.mjs
+   ```
+
+   It checks your file parses and then opens the brief in the browser from the config. If it reports invalid JSON, fix the file and run it again.
 
 ## Tool playbook
 
@@ -19,11 +34,11 @@ Each item you emit carries a `source`: the tool id it came from, exactly as writ
 | Tool id | What to read, last 48h unless stated | Look for |
 |---|---|---|
 | `slack` / `teams` | Messages mentioning the user, DMs, replies in threads they posted in | Who asked what, and whether the user already answered. Fetch each named person's avatar URL when the API offers one |
-| `gcal` / `outlook` | Today's events, 00:00 to 23:59 local, ordered by start | Skip all-day events and ones the user declined. Note attendees and whether the user has not replied yet |
+| `gcal` / `outlook` | Today's events, 00:00 to 23:59 local, ordered by start. If the connector is missing, step 1's `calendarFallback` may hold them | Skip all-day events and ones the user declined. Note attendees and whether the user has not replied yet |
 | `gmail` | Unread or recent mail addressed directly to the user | Threads waiting on their reply. Ignore newsletters and automated notifications |
 | `notion` / `confluence` | Pages and tasks assigned to the user, comments mentioning them | Not-done tasks, overdue dates, questions left on their pages |
 | `jira` / `linear` / `asana` | Issues assigned to the user, and ones they reported that moved | Due or overdue, blocked, waiting on them, changed status since yesterday |
-| `github` / `gitlab` | Run the CLI in Bash from `config.workdir` when set. `gh pr list --author @me`, `gh pr list --search "review-requested:@me"` | Their open PRs, reviews requested of them, new review comments |
+| `github` / `gitlab` | Already in step 1's output (`github.myOpenPrs`, `github.reviewsRequestedOfMe`). Use the connector only for review comments it does not cover | Their open PRs, reviews requested of them, new review comments |
 | `figma` | Files and comments where they are mentioned | Comments awaiting an answer, review requests |
 | `hubspot` / other CRM | Deals and contacts they own | Stalled deals, tasks due, follow-ups promised |
 

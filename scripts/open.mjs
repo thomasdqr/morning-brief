@@ -7,6 +7,21 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const url = `http://localhost:${process.env.PORT || 4747}`;
 
+// Check today's brief parses before opening, so the routine needs no separate
+// validation command of its own. A bad file is worth shouting about.
+const briefs = path.join(ROOT, 'data', 'briefs');
+try {
+  const files = fs.readdirSync(briefs).filter((f) => f.endsWith('.json')).sort();
+  if (files.length) {
+    const latest = path.join(briefs, files[files.length - 1]);
+    JSON.parse(fs.readFileSync(latest, 'utf8'));
+    console.log(`${latest} is valid JSON`);
+  }
+} catch (e) {
+  console.error(`The latest brief is not valid JSON: ${e.message}`);
+  process.exit(1);
+}
+
 let browser = '';
 try { browser = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'config.json'), 'utf8')).browser || ''; } catch {}
 

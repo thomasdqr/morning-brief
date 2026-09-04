@@ -32,12 +32,16 @@ This is the step a plain `git pull` cannot do, and the one most likely to be for
 
 If no such routine exists, they never finished setup: switch to `SETUP.md` from step 8 and say so.
 
-## 5. Check it still works
+## 5. If they complain the routine keeps asking permission
+
+A routine stores its approvals per exact command string, so a run that improvises shell commands never stops asking, and the Auto permission mode is not stored on the routine at all. The current prompt pins the run to two fixed commands for that reason. If they have been fighting prompts every morning, tell them to click **Run now** once and choose **always allow** on each request: with the refreshed prompt that list is now short and stable, so it holds.
+
+## 6. Check it still works
 
 - `curl -s -o /dev/null -w "%{http_code}" http://localhost:4747/api/brief` must be 200.
 - Run `node $DIR/scripts/open.mjs` so they see the page. Tell them to reload the tab if it was already open, since the page is cached in the browser.
 - Their existing brief for today still shows: the update does not regenerate it. Tomorrow's run uses the new version. If they want to see the new version now, tell them to click **Run now** on the routine.
 
-## 6. Mention what is new, briefly
+## 7. Mention what is new, briefly
 
 Read the recent commit subjects (`git -C $DIR log --oneline -15`) and tell them in two or three lines what they gained, in plain words. Skip refactors and internal cleanups; they only care about what they will notice.
